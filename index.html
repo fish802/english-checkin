@@ -5,331 +5,288 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>猿辅导英语 · 21天暑假免费打卡</title>
 <style>
-  :root {
-    --primary: #FF6B35;
-    --primary-light: #FF8C5A;
-    --secondary: #4ECDC4;
-    --bg: #FFF8F4;
-    --card-bg: #FFFFFF;
-    --text: #2D3142;
-    --text-light: #7B7F9E;
-    --done: #52C41A;
-    --done-bg: #F6FFED;
-    --shadow: 0 4px 16px rgba(255,107,53,0.12);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; min-height: 100vh; padding-bottom: 40px; }
 
-  /* ── Header ── */
-  .header {
-    background: linear-gradient(135deg, #FF6B35 0%, #FF4E4E 100%);
-    padding: 32px 20px 48px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 200px; height: 200px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 50%;
-  }
-  .header::after {
-    content: '';
-    position: absolute;
-    bottom: -80px; left: -40px;
-    width: 240px; height: 240px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 50%;
-  }
-  .logo-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.2);
-    border: 1.5px solid rgba(255,255,255,0.4);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 4px 14px;
-    border-radius: 20px;
-    margin-bottom: 14px;
-    letter-spacing: 1px;
-  }
-  .header h1 {
-    color: #fff;
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-  }
-  .header p {
-    color: rgba(255,255,255,0.85);
-    font-size: 14px;
-    line-height: 1.6;
-  }
-  .stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-top: 20px;
-  }
-  .stat-item {
-    background: rgba(255,255,255,0.18);
-    border-radius: 12px;
-    padding: 10px 20px;
-    color: #fff;
-    text-align: center;
-  }
-  .stat-num { font-size: 22px; font-weight: 800; }
-  .stat-label { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+/* ===== HEADER ===== */
+.top-bar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px 16px; text-align: center; }
+.top-bar .logo { font-size: 13px; opacity: 0.85; margin-bottom: 6px; letter-spacing: 2px; }
+.top-bar h1 { font-size: 24px; margin-bottom: 4px; }
+.top-bar .sub { font-size: 13px; opacity: 0.8; line-height: 1.6; }
+.stats-row { display: flex; justify-content: center; gap: 32px; margin: 16px 0 12px; }
+.stat-box { text-align: center; }
+.stat-num { font-size: 26px; font-weight: 700; }
+.stat-label { font-size: 11px; opacity: 0.75; }
+.progress-bar-wrap { background: rgba(255,255,255,0.2); border-radius: 10px; height: 8px; margin: 8px 40px 0; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: #ffd700; border-radius: 10px; transition: width 0.3s; }
 
-  /* ── Progress Bar ── */
-  .progress-section {
-    background: #fff;
-    margin: -20px 16px 0;
-    border-radius: 16px;
-    padding: 16px 20px;
-    box-shadow: var(--shadow);
-    position: relative;
-    z-index: 10;
-  }
-  .progress-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .progress-header span { font-size: 13px; font-weight: 600; color: var(--text); }
-  .progress-header .prog-count { color: var(--primary); }
-  .progress-bar-bg {
-    background: #FFE8DE;
-    border-radius: 8px;
-    height: 10px;
-    overflow: hidden;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #FF6B35, #FF4E4E);
-    border-radius: 8px;
-    transition: width 0.6s cubic-bezier(.4,0,.2,1);
-    width: 0%;
-  }
+/* ===== CARDS ===== */
+.cards { max-width: 420px; margin: 20px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+.day-card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; }
+.day-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.day-card:active { transform: scale(0.98); }
+.day-card.done .card-body { opacity: 0.6; }
+.card-body { padding: 14px 16px 12px; flex: 1; }
+.card-badge { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.card-badge .badge-dot { width: 26px; height: 26px; background: linear-gradient(135deg, #ff9800, #ff5722); border-radius: 7px; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.card-badge .badge-text { font-size: 12px; color: #999; }
+.card-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 4px; }
+.card-desc { font-size: 12px; color: #888; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-example { font-size: 16px; color: #666; font-style: italic; margin: 4px 0 2px; line-height: 1.5; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding: 10px 16px; }
+.card-btn { background: linear-gradient(135deg, #ff9800, #ff5722); color: #fff; border: none; border-radius: 20px; padding: 6px 18px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.card-btn:hover { opacity: 0.9; }
+.card-btn:active { transform: scale(0.96); }
+.card-check { font-size: 18px; }
+.card-tag { display: inline-block; background: #e8f5e9; color: #2e7d32; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-top: 4px; }
 
-  /* ── Grid ── */
-  .main { padding: 20px 16px 40px; }
-  .section-title {
-    font-size: 16px; font-weight: 700;
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .section-title::before {
-    content: '';
-    display: inline-block;
-    width: 4px; height: 18px;
-    background: var(--primary);
-    border-radius: 2px;
-  }
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-    gap: 12px;
-  }
+/* ===== MODAL ===== */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; overflow-y: auto; }
+.modal-overlay.show { display: block; }
+.modal-content { background: #f5f7fa; max-width: 600px; margin: 0 auto; min-height: 100vh; position: relative; }
+.modal-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; }
+.modal-header h2 { font-size: 20px; }
+.modal-header .close-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-body { padding: 16px; }
 
-  /* ── Day Card ── */
-  .day-card {
-    background: var(--card-bg);
-    border-radius: 14px;
-    padding: 16px 12px 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    cursor: pointer;
-    transition: transform 0.18s, box-shadow 0.18s;
-    position: relative;
-    border: 2px solid transparent;
-    text-decoration: none;
-    display: block;
-  }
-  .day-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(255,107,53,0.15);
-    border-color: var(--primary-light);
-  }
-  .day-card.done {
-    background: var(--done-bg);
-    border-color: var(--done);
-  }
-  .day-card.locked {
-    opacity: 0.55;
-    cursor: default;
-    pointer-events: none;
-  }
-  .day-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #FF6B35, #FF4E4E);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 9px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-  }
-  .day-card.done .day-badge { background: linear-gradient(135deg, #52C41A, #389E0D); }
-  .day-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-    line-height: 1.4;
-  }
-  .day-subtitle {
-    font-size: 11px;
-    color: var(--text-light);
-    line-height: 1.4;
-  }
-  .done-mark {
-    position: absolute;
-    top: 10px; right: 10px;
-    width: 22px; height: 22px;
-    background: var(--done);
-    border-radius: 50%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 13px;
-  }
-  .day-card.done .done-mark { display: flex; }
-  .enter-btn {
-    display: block;
-    width: 100%;
-    margin-top: 10px;
-    padding: 6px 0;
-    background: linear-gradient(135deg, #FF6B35, #FF4E4E);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .day-card.done .enter-btn { background: linear-gradient(135deg, #52C41A, #389E0D); }
-  .enter-btn:hover { opacity: 0.88; }
+.section-title { font-size: 18px; font-weight: 700; color: #333; margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+.section-title .badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 8px; font-size: 14px; color: #fff; }
+.badge-vocab { background: #ff9800; }
+.badge-grammar { background: #3b82f6; }
+.badge-sentence { background: #10b981; }
 
-  /* ── Footer ── */
-  .footer {
-    text-align: center;
-    padding: 20px;
-    color: var(--text-light);
-    font-size: 12px;
-  }
+.q-card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.q-card .q-text { font-size: 15px; color: #333; margin-bottom: 12px; line-height: 1.6; white-space: pre-line; }
+.q-card .opts { display: flex; flex-direction: column; gap: 8px; }
+.q-card .opt { padding: 10px 14px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.q-card .opt:hover { border-color: #667eea; background: #f0f0ff; }
+.q-card .opt:active { transform: scale(0.98); }
+.q-card .opt.correct { border-color: #10b981; background: #d1fae5; color: #065f46; font-weight: 600; }
+.q-card .opt.wrong { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
+.q-card .opt.dim { opacity: 0.5; pointer-events: none; }
+.q-card .feedback { margin-top: 8px; font-size: 13px; padding: 6px 10px; border-radius: 6px; display: none; }
+.q-card .feedback.show { display: block; }
+.fb-ok { color: #065f46; background: #d1fae5; }
+.fb-err { color: #991b1b; background: #fee2e2; }
+
+.words-area { display: flex; flex-wrap: wrap; gap: 8px; min-height: 48px; padding: 10px; border: 2px dashed #d1d5db; border-radius: 10px; margin-bottom: 10px; align-items: center; }
+.words-area.filled { border-color: #667eea; background: #fafaff; }
+.word-chip { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 20px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.15s; user-select: none; }
+.word-chip.pool { background: #e0e7ff; color: #3730a3; border: 1.5px solid #c7d2fe; }
+.word-chip.pool:hover { background: #c7d2fe; }
+.word-chip.pool.used { opacity: 0.3; pointer-events: none; }
+.word-chip.placed { background: #667eea; color: #fff; }
+.word-chip.placed:hover { background: #ef4444; }
+.sentence-actions { display: flex; gap: 8px; }
+.btn { padding: 8px 20px; border-radius: 8px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.btn-check { background: #667eea; color: #fff; }
+.btn-check:hover { background: #5a6fd6; }
+.btn-check:disabled { opacity: 0.4; pointer-events: none; }
+.btn-reset { background: #e5e7eb; color: #666; }
+.btn-reset:hover { background: #d1d5db; }
+
+.done-panel { display: none; background: #fff; border-radius: 16px; padding: 30px 20px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: 20px; }
+.done-panel.show { display: block; }
+.score-ring { width: 120px; height: 120px; border-radius: 50%; border: 8px solid #e5e7eb; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #667eea; }
+.stats { display: flex; justify-content: center; gap: 30px; margin: 16px 0; }
+.stat-item { text-align: center; }
+.stat-item .sn { font-size: 22px; font-weight: 700; color: #333; }
+.stat-item .sl { font-size: 12px; color: #999; }
+.btn-submit { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 12px 40px; border-radius: 25px; font-size: 16px; font-weight: 600; border: none; cursor: pointer; margin-top: 12px; }
+.btn-submit:hover { opacity: 0.9; }
+
+.footer { text-align: center; padding: 20px 16px 40px; color: #bbb; font-size: 13px; }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo-badge">🦍 猿辅导英语</div>
+<div class="top-bar">
+  <div class="logo">🦍 猿辅导英语</div>
   <h1>21天暑假免费打卡</h1>
-  <p>每天11道题，巩固26年寒春词汇与语法<br>坚持打卡，迎接新学期！</p>
+  <p class="sub">每天11道题，巩固26年寒春词汇与语法<br>坚持打卡，迎接新学期！</p>
   <div class="stats-row">
-    <div class="stat-item">
-      <div class="stat-num">21</div>
-      <div class="stat-label">共计课程</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num" id="doneCount">0</div>
-      <div class="stat-label">已完成</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num" id="totalQ">231</div>
-      <div class="stat-label">练习题目</div>
-    </div>
+    <div class="stat-box"><div class="stat-num">21</div><div class="stat-label">共计课程</div></div>
+    <div class="stat-box"><div class="stat-num" id="doneCount">0</div><div class="stat-label">已完成</div></div>
+    <div class="stat-box"><div class="stat-num">231</div><div class="stat-label">练习题目</div></div>
   </div>
+  <div style="font-size:12px;opacity:0.75;">打卡进度 <span id="progressFraction">0</span> / 21 天</div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
 </div>
 
-<div class="progress-section">
-  <div class="progress-header">
-    <span>打卡进度</span>
-    <span class="prog-count" id="progText">0 / 21 天</span>
-  </div>
-  <div class="progress-bar-bg">
-    <div class="progress-bar-fill" id="progressBar"></div>
-  </div>
+<div style="max-width:420px;margin:0 auto;padding:0 16px;text-align:center;">
+  <p style="font-size:16px;font-weight:700;color:#333;margin:16px 0 4px;">📅 选择今天的打卡内容</p>
 </div>
 
-<div class="main">
-  <div class="section-title">选择今天的打卡内容</div>
-  <div class="cards-grid" id="cardsGrid"></div>
-</div>
+<div class="cards" id="cardsContainer"></div>
 
 <div class="footer">猿辅导英语 · 暑假学习加油站 🌟</div>
 
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div style="width:36px"></div>
+      <h2 id="modalTitle">Day 1</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
 <script>
-// ── 课程数据 ──
-const LESSONS = [
-  { day: 1,  title: "请求许可 Can I...?",    subtitle: "Can I use your...? · 文具词汇" },
-  { day: 2,  title: "have got 拥有句型",      subtitle: "I've got a... · 生活物品" },
-  { day: 3,  title: "Have you got...?",       subtitle: "一般疑问句·是否拥有 · 玩具" },
-  { day: 4,  title: "I'd like some...",       subtitle: "表达想吃/建议吃 · 食物词汇" },
-  { day: 5,  title: "Would you like...?",     subtitle: "邀请用餐及应答 · 美食词汇" },
-  { day: 6,  title: "感官动词 with结构",      subtitle: "I see/hear with my... · 感官词汇" },
-  { day: 7,  title: "What are these/those?",  subtitle: "询问近处/远处动物 · 动物词汇" },
-  { day: 8,  title: "Whose...is this?",       subtitle: "询问物品归属·描述颜色 · 玩具" },
-  { day: 9,  title: "Where is...? 询问位置",  subtitle: "He's in the + 房间 · 家居房间" },
-  { day: 10, title: "现在进行时（肯定句）",   subtitle: "I'm playing... · 运动词汇" },
-  { day: 11, title: "What day is it?",        subtitle: "询问星期几 · 星期词汇" },
-  { day: 12, title: "课程安排 have...on...",  subtitle: "I have science on Monday · 科目" },
-  { day: 13, title: "Who is that...?",        subtitle: "询问远处人物身份 · 人物词汇" },
-  { day: 14, title: "How many...are there?",  subtitle: "数量询问+there be · 数字11-15" },
-  { day: 15, title: "How much is this?",      subtitle: "询问价格 · 数字16-20" },
-  { day: 16, title: "What time is it?",       subtitle: "询问时间·该做某事 · 日常活动" },
-  { day: 17, title: "What is he/she doing?",  subtitle: "询问他人正在做什么 · 动作词汇" },
-  { day: 18, title: "There be + 方位介词",    subtitle: "in front of/behind/next to · 家居" },
-  { day: 19, title: "Are you...ing? 进行时",  subtitle: "询问是否正在做某事 · 活动词汇" },
-  { day: 20, title: "What are you doing?",    subtitle: "询问对方正在做什么并回答 · 活动" },
-  { day: 21, title: "综合复习",               subtitle: "20课精华汇总 · 冲刺提分" },
-];
+// ================ LESSON DATA ================
+var LESSONS=[];
+LESSONS[1]={t:"Can I...?",e:"Can I use your...?",d:"请求许可句型 · 文具词汇",v:[{q:"\"教室\"的英文是：",o:["A. classroom","B. bedroom","C. bathroom","D. living room"],a:0},{q:"\"橡皮\"的英文是：",o:["A. ruler","B. pen","C. eraser","D. pencil"],a:2},{q:"\"剪刀\"的英文是：",o:["A. knife","B. scissors","C. sharpener","D. cutter"],a:1},{q:"\"胶水\"的英文是：",o:["A. tape","B. paste","C. stick","D. glue"],a:3},{q:"\"用；使用\"的英文是：",o:["A. make","B. do","C. use","D. take"],a:2}],g:[{q:"Can I ___ your pen?",o:["A. uses","B. use","C. using","D. to use"],a:1},{q:"— Can I use your ruler?\n— Yes, you ___.",o:["A. do","B. are","C. can","D. have"],a:2},{q:"— Can I borrow your glue?\n— ___, here you are.",o:["A. No","B. Sorry","C. Sure","D. Not"],a:2},{q:"\"Can I use it?\"的意思是：",o:["A. 我会做吗？","B. 我能用吗？","C. 它是我的吗？","D. 你看见了吗？"],a:1},{q:"— Can I sit here?\n— No, you ___.",o:["A. can","B. can't","C. do","D. are"],a:1}],s:{w:["I","use","your","eraser","Can","?"],a:"Can I use your eraser ?"}};
+LESSONS[2]={t:"have got",e:"I've got a...",d:"拥有句型 · 学习用品",v:[{q:"\"书包\"的英文是：",o:["A. schoolbag","B. backpack","C. handbag","D. suitcase"],a:0},{q:"\"手表\"的英文是：",o:["A. clock","B. watch","C. hour","D. time"],a:1},{q:"\"笔记本\"的英文是：",o:["A. book","B. novel","C. notebook","D. textbook"],a:2},{q:"\"铅笔盒\"的英文是：",o:["A. pencil box","B. pen box","C. box pen","D. box pencil"],a:0},{q:"\"尺子\"的英文是：",o:["A. rubber","B. ruler","C. rule","D. ruller"],a:1}],g:[{q:"I ___ got a new watch.",o:["A. has","B. am","C. have","D. is"],a:2},{q:"She ___ got a pink schoolbag.",o:["A. have","B. is","C. are","D. has"],a:3},{q:"They ___ got many notebooks.",o:["A. has","B. have","C. is","D. are"],a:1},{q:"— Have you got a ruler?\n— Yes, I ___.",o:["A. do","B. am","C. have","D. has"],a:2},{q:"He ___ got a pencil box.",o:["A. haven't","B. isn't","C. hasn't","D. aren't"],a:2}],s:{w:["got","I","a","have","new","notebook","."],a:"I have got a new notebook ."}};
+LESSONS[3]={t:"Have you got...?",e:"Have you got a...?",d:"一般疑问句 · 日常物品",v:[{q:"\"蜡笔\"的英文是：",o:["A. color pen","B. crayon","C. marker","D. chalk"],a:1},{q:"\"字典\"的英文是：",o:["A. dictionary","B. book","C. diary","D. notebook"],a:0},{q:"\"卷笔刀\"的英文是：",o:["A. cutter","B. knife","C. sharpener","D. scissors"],a:2},{q:"\"图画\"的英文是：",o:["A. photo","B. drawing","C. paper","D. painting"],a:1},{q:"\"彩色铅笔\"的英文是：",o:["A. colour pencil","B. rainbow pen","C. color crayon","D. paint pen"],a:0}],g:[{q:"— ___ you got a crayon?\n— Yes, I have.",o:["A. Do","B. Are","C. Have","D. Has"],a:2},{q:"— Have you got a dictionary?\n— No, I ___.",o:["A. have","B. do","C. am","D. haven't"],a:3},{q:"— ___ she got a sharpener?\n— Yes, she has.",o:["A. Have","B. Has","C. Do","D. Is"],a:1},{q:"\"Have you got a watch?\"的最佳回答是：",o:["A. Yes, I do.","B. Yes, I have.","C. Yes, I am.","D. Yes, I got."],a:1},{q:"— Have they got crayons?\n— Yes, they ___.",o:["A. have","B. has","C. do","D. are"],a:0}],s:{w:["got","you","Have","a","dictionary","?"],a:"Have you got a dictionary ?"}};
+LESSONS[4]={t:"I'd like some...",e:"I'd like some...",d:"表达想吃 · 食物词汇",v:[{q:"\"大米；米饭\"的英文是：",o:["A. noodles","B. bread","C. rice","D. cake"],a:2},{q:"\"肉\"的英文是：",o:["A. meet","B. meat","C. chicken","D. fish"],a:1},{q:"\"饺子\"的英文是：",o:["A. noodles","B. cake","C. bread","D. dumplings"],a:3},{q:"\"蔬菜\"的英文是：",o:["A. fruit","B. vegetables","C. meat","D. food"],a:1},{q:"\"汤\"的英文是：",o:["A. soup","B. soap","C. juice","D. water"],a:0}],g:[{q:"I'd like ___ rice.",o:["A. a","B. an","C. some","D. any"],a:2},{q:"\"I'd like\"是___的缩写。",o:["A. I had like","B. I did like","C. I would like","D. I do like"],a:2},{q:"She'd like ___ meat.",o:["A. a","B. an","C. some","D. any"],a:2},{q:"— What would you like?\n— ___ some soup.",o:["A. I like","B. I want","C. I'd like","D. I have"],a:2},{q:"Would you like ___ dumplings?",o:["A. a","B. an","C. some","D. any"],a:2}],s:{w:["I'd","like","some","vegetables","."],a:"I'd like some vegetables ."}};
+LESSONS[5]={t:"Would you like...?",e:"Would you like some...?",d:"邀请句型 · 饮料词汇",v:[{q:"\"水\"的英文是：",o:["A. juice","B. milk","C. water","D. tea"],a:2},{q:"\"牛奶\"的英文是：",o:["A. milk","B. juice","C. water","D. coffee"],a:0},{q:"\"果汁\"的英文是：",o:["A. milk","B. water","C. juice","D. tea"],a:2},{q:"\"茶\"的英文是：",o:["A. coffee","B. tea","C. milk","D. cola"],a:1},{q:"\"可乐\"的英文是：",o:["A. water","B. juice","C. cola","D. soda"],a:2}],g:[{q:"— Would you like ___ tea?\n— Yes, please.",o:["A. a","B. an","C. some","D. any"],a:2},{q:"— Would you like some juice?\n— ___.",o:["A. Yes, I would","B. Yes, please","C. Yes, I do","D. Yes, I am"],a:1},{q:"— Would you like some milk?\n— No, ___.",o:["A. please","B. I wouldn't","C. thank you","D. I don't"],a:2},{q:"\"Would you like some water?\"的意思是：",o:["A. 你喜欢水吗？","B. 你要喝点水吗？","C. 水是什么？","D. 你能喝水吗？"],a:1},{q:"\"Yes, please.\"用于：",o:["A. 拒绝邀请","B. 接受邀请","C. 提问","D. 告别"],a:1}],s:{w:["like","you","Would","some","cola","?"],a:"Would you like some cola ?"}};
+LESSONS[6]={t:"感官动词",e:"It looks/smells...",d:"感官描述 · look/sound/taste",v:[{q:"\"闻起来\"的英文是：",o:["A. look","B. taste","C. smell","D. listen"],a:2},{q:"\"尝起来\"的英文是：",o:["A. look","B. taste","C. smell","D. hear"],a:1},{q:"\"听起来\"的英文是：",o:["A. look","B. feel","C. sound","D. taste"],a:2},{q:"\"看起来\"的英文是：",o:["A. see","B. look","C. watch","D. sound"],a:1},{q:"\"摸起来\"的英文是：",o:["A. feel","B. smell","C. taste","D. look"],a:0}],g:[{q:"The cake ___ good.",o:["A. smell","B. smells","C. smelling","D. to smell"],a:1},{q:"These flowers ___ nice.",o:["A. look","B. looks","C. looking","D. to look"],a:0},{q:"The soup tastes ___.",o:["A. nicely","B. well","C. delicious","D. goodly"],a:2},{q:"— How does it smell?\n— It ___ good.",o:["A. smell","B. is smell","C. smelling","D. smells"],a:3},{q:"\"It sounds great!\"的意思是：",o:["A. 它看起来好！","B. 听起来很棒！","C. 闻起来不错！","D. 味道很好！"],a:1}],s:{w:["soup","tastes","The","delicious","."],a:"The soup tastes delicious ."}};
+LESSONS[7]={t:"What are these?",e:"What are these/those?",d:"复数询问 · 动物词汇",v:[{q:"\"山羊\"的英文是：",o:["A. sheep","B. cow","C. goat","D. horse"],a:2},{q:"\"母鸡\"的英文是：",o:["A. chicken","B. hen","C. duck","D. bird"],a:1},{q:"\"马\"的英文是：",o:["A. cow","B. horse","C. donkey","D. sheep"],a:1},{q:"\"鸭子\"的英文是：",o:["A. duck","B. goose","C. hen","D. bird"],a:0},{q:"\"绵羊\"的英文是：",o:["A. goat","B. cow","C. sheep","D. lamb"],a:2}],g:[{q:"— What are these?\n— They ___ goats.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"— What ___ those?\n— They are ducks.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"\"这些是什么？\"的英文是：",o:["A. What is this?","B. What are these?","C. What is that?","D. What are that?"],a:1},{q:"— Are these hens?\n— Yes, they ___.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"\"this\"的复数形式是：",o:["A. thises","B. that","C. those","D. these"],a:3}],s:{w:["are","What","these","?"],a:"What are these ?"}};
+LESSONS[8]={t:"Whose...is this?",e:"Whose...is this?",d:"所属关系 · 玩具词汇",v:[{q:"\"玩具娃娃\"的英文是：",o:["A. bear","B. doll","C. robot","D. toy"],a:1},{q:"\"气球\"的英文是：",o:["A. ball","B. balloon","C. kite","D. bubble"],a:1},{q:"\"风筝\"的英文是：",o:["A. kite","B. bird","C. balloon","D. plane"],a:0},{q:"\"机器人\"的英文是：",o:["A. doll","B. robot","C. machine","D. computer"],a:1},{q:"\"玩具\"的英文是：",o:["A. game","B. play","C. toy","D. fun"],a:2}],g:[{q:"— ___ doll is this?\n— It's Amy's.",o:["A. Who","B. What","C. Whose","D. Which"],a:2},{q:"The kite is ___.",o:["A. Tom","B. Toms","C. Tom's","D. of Tom"],a:2},{q:"\"这是谁的气球？\"的英文是：",o:["A. Who balloon is this?","B. Whose balloon is this?","C. What balloon is this?","D. Which balloon is this?"],a:1},{q:"— Whose robot is that?\n— It's ___.",o:["A. my brother","B. my brothers","C. my brother's","D. mine brother"],a:2},{q:"\"Amy's doll\"的意思是：",o:["A. Amy是娃娃","B. Amy的娃娃","C. 娃娃是Amy","D. Amy和娃娃"],a:1}],s:{w:["is","this","Whose","doll","?"],a:"Whose doll is this ?"}};
+LESSONS[9]={t:"Where is...?",e:"Where is/are...?",d:"询问位置 · 家居词汇",v:[{q:"\"卧室\"的英文是：",o:["A. kitchen","B. bathroom","C. bedroom","D. living room"],a:2},{q:"\"厨房\"的英文是：",o:["A. kitchen","B. bedroom","C. bathroom","D. garden"],a:0},{q:"\"沙发\"的英文是：",o:["A. desk","B. sofa","C. table","D. chair"],a:1},{q:"\"桌子\"的英文是：",o:["A. chair","B. desk","C. sofa","D. bed"],a:1},{q:"\"在...下面\"的英文是：",o:["A. on","B. in","C. under","D. behind"],a:2}],g:[{q:"— Where ___ my book?\n— It's on the desk.",o:["A. am","B. is","C. are","D. be"],a:1},{q:"The cat is ___ the sofa.",o:["A. on","B. under","C. in","D. at"],a:0},{q:"— Where are the toys?\n— They're ___ the box.",o:["A. on","B. under","C. in","D. at"],a:2},{q:"\"沙发下面\"的英文是：",o:["A. on the sofa","B. in the sofa","C. under the sofa","D. behind the sofa"],a:2},{q:"— Where is the doll?\n— ___ in the bedroom.",o:["A. She's","B. It's","C. He's","D. They're"],a:1}],s:{w:["is","my","Where","robot","?"],a:"Where is my robot ?"}};
+LESSONS[10]={t:"现在进行时",e:"I am / He is + Ving",d:"be+Ving · 运动词汇",v:[{q:"\"滑冰\"的英文是：",o:["A. skate","B. ski","C. swim","D. run"],a:0},{q:"\"跑步\"的英文是：",o:["A. walk","B. run","C. jump","D. skip"],a:1},{q:"\"游泳\"的英文是：",o:["A. skate","B. ski","C. swim","D. dive"],a:2},{q:"\"跳舞\"的英文是：",o:["A. sing","B. dance","C. draw","D. jump"],a:1},{q:"\"唱歌\"的英文是：",o:["A. sing","B. song","C. dance","D. music"],a:0}],g:[{q:"I ___ swimming now.",o:["A. is","B. am","C. are","D. be"],a:1},{q:"She ___ skating.",o:["A. is","B. am","C. are","D. be"],a:0},{q:"\"run\"的现在分词是：",o:["A. runing","B. runned","C. running","D. runs"],a:2},{q:"They ___ dancing in the room.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"\"swim\"的现在分词是：",o:["A. swiming","B. swimming","C. swimmming","D. swimmed"],a:1}],s:{w:["is","He","in","the","pool","swimming","."],a:"He is swimming in the pool ."}};
+LESSONS[11]={t:"What day is it?",e:"What day is it today?",d:"询问星期 · 一周七天",v:[{q:"\"星期一\"的英文是：",o:["A. Sunday","B. Monday","C. Tuesday","D. Wednesday"],a:1},{q:"\"星期五\"的英文是：",o:["A. Thursday","B. Friday","C. Saturday","D. Sunday"],a:1},{q:"\"星期天\"的英文是：",o:["A. Monday","B. Saturday","C. Sunday","D. Friday"],a:2},{q:"\"星期三\"的英文是：",o:["A. Tuesday","B. Thursday","C. Wednesday","D. Monday"],a:2},{q:"\"今天\"的英文是：",o:["A. tomorrow","B. yesterday","C. today","D. day"],a:2}],g:[{q:"— What day is it today?\n— ___ Monday.",o:["A. This is","B. Today is","C. It's","D. That's"],a:2},{q:"— What day ___ it?\n— It's Friday.",o:["A. am","B. is","C. are","D. be"],a:1},{q:"\"今天星期几？\"的英文是：",o:["A. What day is it today?","B. What time is it?","C. What date is today?","D. When is it?"],a:0},{q:"— Is it Wednesday?\n— Yes, ___.",o:["A. it's","B. it is","C. is it","D. this is"],a:1},{q:"\"It's Sunday today.\"变一般疑问句：",o:["A. It is Sunday today?","B. Is it Sunday today?","C. Does it Sunday today?","D. Sunday is it today?"],a:1}],s:{w:["day","is","What","it","today","?"],a:"What day is it today ?"}};
+LESSONS[12]={t:"have...on...",e:"We have...on Monday.",d:"某天的课程 · 科目词汇",v:[{q:"\"数学\"的英文是：",o:["A. maths","B. science","C. English","D. Chinese"],a:0},{q:"\"英语\"的英文是：",o:["A. Chinese","B. English","C. maths","D. music"],a:1},{q:"\"科学\"的英文是：",o:["A. maths","B. English","C. science","D. sport"],a:2},{q:"\"音乐\"的英文是：",o:["A. art","B. PE","C. music","D. science"],a:2},{q:"\"美术\"的英文是：",o:["A. music","B. art","C. PE","D. maths"],a:1}],g:[{q:"We have English ___ Monday.",o:["A. at","B. in","C. on","D. for"],a:2},{q:"— What subjects do you have on Tuesday?\n— We have maths ___ English.",o:["A. or","B. but","C. and","D. on"],a:2},{q:"She ___ music on Wednesday.",o:["A. has","B. have","C. is","D. are"],a:0},{q:"— Do you have PE on Friday?\n— No, we ___.",o:["A. does","B. don't","C. aren't","D. haven't"],a:1},{q:"\"周一我们有科学课。\"的英文是：",o:["A. We have science on Monday.","B. We have science in Monday.","C. We on Monday have science.","D. On Monday have we science."],a:0}],s:{w:["have","on","I","art","Friday","."],a:"I have art on Friday ."}};
+LESSONS[13]={t:"Who is that?",e:"Who is that boy/girl?",d:"询问身份 · 家庭成员",v:[{q:"\"爸爸\"最常用的英文是：",o:["A. father","B. dad","C. daddy","D. papa"],a:1},{q:"\"妈妈\"最常用的英文是：",o:["A. mother","B. mom","C. mummy","D. mama"],a:1},{q:"\"兄弟\"的英文是：",o:["A. father","B. sister","C. brother","D. cousin"],a:2},{q:"\"姐妹\"的英文是：",o:["A. brother","B. mother","C. aunt","D. sister"],a:3},{q:"\"朋友\"的英文是：",o:["A. classmate","B. teacher","C. friend","D. student"],a:2}],g:[{q:"— ___ is that girl?\n— She is my sister.",o:["A. What","B. Who","C. Whose","D. Which"],a:1},{q:"\"那个男孩是谁？\"的英文是：",o:["A. Who is that boy?","B. What is that boy?","C. Who that boy is?","D. That boy is who?"],a:0},{q:"— Who is she?\n— ___ my mom.",o:["A. He's","B. It's","C. She's","D. Her's"],a:2},{q:"— Who ___ they?\n— They are my friends.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"This is ___ brother.",o:["A. I","B. me","C. my","D. mine"],a:2}],s:{w:["is","Who","that","boy","?"],a:"Who is that boy ?"}};
+LESSONS[14]={t:"How many...?",e:"How many books do you...?",d:"询问数量 · 数字应用",v:[{q:"\"十一\"的英文是：",o:["A. ten one","B. eleven","C. twelven","D. onety one"],a:1},{q:"\"十五\"的英文是：",o:["A. fiveteen","B. fifty","C. fifteen","D. five-ten"],a:2},{q:"\"二十\"的英文是：",o:["A. twoty","B. twoteen","C. twelvety","D. twenty"],a:3},{q:"\"三十\"的英文是：",o:["A. threety","B. thirty","C. thirteen","D. threeteen"],a:1},{q:"\"十二\"的英文是：",o:["A. ten-two","B. twoteen","C. twelve","D. twenteen"],a:2}],g:[{q:"— How many ___ are there?\n— There are five.",o:["A. book","B. books","C. a book","D. the book"],a:1},{q:"— ___ robots do you have?\n— I have three.",o:["A. How much","B. How old","C. How many","D. How long"],a:2},{q:"There ___ twenty students in the class.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"\"你有多少个娃娃？\"的英文是：",o:["A. How much dolls do you have?","B. How many doll do you have?","C. How many dolls do you have?","D. How doll you have?"],a:2},{q:"— How many goats?\n— ___.",o:["A. It's five","B. They are five","C. There are five","D. Five goat"],a:2}],s:{w:["How","many","books","have","do","you","?"],a:"How many books do you have ?"}};
+LESSONS[15]={t:"How much...?",e:"How much is this...?",d:"询问价格 · 购物场景",v:[{q:"\"元\"(人民币)的英文是：",o:["A. dollar","B. pound","C. yuan","D. money"],a:2},{q:"\"便宜\"的英文是：",o:["A. expensive","B. cheap","C. good","D. bad"],a:1},{q:"\"贵\"的英文是：",o:["A. cheap","B. expensive","C. much","D. many"],a:1},{q:"\"蛋糕\"的英文是：",o:["A. cookie","B. bread","C. cake","D. pie"],a:2},{q:"\"买\"的英文是：",o:["A. sell","B. buy","C. give","D. take"],a:1}],g:[{q:"— How much ___ the cake?\n— It's twelve yuan.",o:["A. is","B. am","C. are","D. be"],a:0},{q:"— How much ___ the dolls?\n— They are thirty yuan.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"\"这个蛋糕多少钱？\"的英文是：",o:["A. How many is the cake?","B. How much is the cake?","C. What much is the cake?","D. How money is the cake?"],a:1},{q:"— How much is this eraser?\n— ___ two yuan.",o:["A. They're","B. It's","C. That's","D. This is"],a:1},{q:"\"这些娃娃十元钱。\"的英文是：",o:["A. The dolls is ten yuan.","B. The dolls are ten yuans.","C. The dolls are ten yuan.","D. The doll are ten yuan."],a:2}],s:{w:["much","How","is","this","bowl","?"],a:"How much is this bowl ?"}};
+LESSONS[16]={t:"What time...?",e:"What time do you...?",d:"询问时间 · 日常作息",v:[{q:"\"起床\"的英文是：",o:["A. get up","B. stand up","C. wake on","D. rise up"],a:0},{q:"\"吃早餐\"的英文是：",o:["A. eat dinner","B. have breakfast","C. eat lunch","D. have meal"],a:1},{q:"\"上学\"的英文是：",o:["A. go home","B. go to bed","C. go to school","D. go out"],a:2},{q:"\"睡觉\"的英文是：",o:["A. go school","B. go bed","C. go to sleep","D. go to bed"],a:3},{q:"\"吃晚饭\"的英文是：",o:["A. have breakfast","B. have lunch","C. have dinner","D. have meal"],a:2}],g:[{q:"— What time ___ it?\n— It's seven o'clock.",o:["A. is","B. am","C. are","D. be"],a:0},{q:"I get up ___ six o'clock.",o:["A. on","B. in","C. at","D. for"],a:2},{q:"— What time do you go to school?\n— ___ eight o'clock.",o:["A. On","B. In","C. At","D. For"],a:2},{q:"\"几点了？\"的英文是：",o:["A. What day is it?","B. What time is it?","C. When is it?","D. How long is it?"],a:1},{q:"She goes to bed ___ nine o'clock.",o:["A. on","B. in","C. at","D. for"],a:2}],s:{w:["time","do","you","What","get","up","?"],a:"What time do you get up ?"}};
+LESSONS[17]={t:"What is he doing?",e:"What is he/she doing?",d:"询问第三人称动作",v:[{q:"\"读书\"的英文是：",o:["A. read book","B. read a book","C. look book","D. watch book"],a:1},{q:"\"写作业\"的英文是：",o:["A. do homework","B. write work","C. make homework","D. study work"],a:0},{q:"\"看电视\"的英文是：",o:["A. see TV","B. look TV","C. watch TV","D. show TV"],a:2},{q:"\"画画\"的英文是：",o:["A. make picture","B. draw picture","C. do drawing","D. draw a picture"],a:3},{q:"\"听音乐\"的英文是：",o:["A. hear music","B. listen to music","C. sound music","D. enjoy music"],a:1}],g:[{q:"— What ___ he doing?\n— He is reading.",o:["A. am","B. is","C. are","D. be"],a:1},{q:"— What is she doing?\n— She ___ watching TV.",o:["A. am","B. is","C. are","D. be"],a:1},{q:"— What are they doing?\n— They ___ doing homework.",o:["A. am","B. is","C. are","D. be"],a:2},{q:"\"他在做什么？\"的英文是：",o:["A. What he is doing?","B. What does he doing?","C. What is he doing?","D. What he doing?"],a:2},{q:"\"She is drawing a picture.\"变为一般疑问句：",o:["A. Does she drawing a picture?","B. Is she drawing a picture?","C. She is drawing a picture?","D. Drawing she is a picture?"],a:1}],s:{w:["is","What","she","doing","?"],a:"What is she doing ?"}};
+LESSONS[18]={t:"There be + 方位词",e:"There is...beside...",d:"位置描述 · 介词短语",v:[{q:"\"在...旁边\"的英文是：",o:["A. behind","B. in front of","C. beside","D. under"],a:2},{q:"\"在...后面\"的英文是：",o:["A. beside","B. behind","C. under","D. on"],a:1},{q:"\"在...前面\"的英文是：",o:["A. in front of","B. behind","C. on","D. near"],a:0},{q:"\"在...之间\"的英文是：",o:["A. under","B. beside","C. between","D. behind"],a:2},{q:"\"在...附近\"的英文是：",o:["A. far","B. near","C. behind","D. front"],a:1}],g:[{q:"There ___ a book on the desk.",o:["A. is","B. am","C. are","D. be"],a:0},{q:"There ___ two cats under the sofa.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"The ball is ___ the chair.",o:["A. between","B. under","C. in front of","D. beside"],a:1},{q:"\"床旁边有一张桌子。\"的英文是：",o:["A. There is a desk beside the bed.","B. There are a desk beside the bed.","C. There is a desk behind the bed.","D. A desk is there beside the bed."],a:0},{q:"There ___ a robot between the dolls.",o:["A. is","B. am","C. are","D. be"],a:0}],s:{w:["is","There","a","kite","on","the","wall","."],a:"There is a kite on the wall ."}};
+LESSONS[19]={t:"Are you + Ving?",e:"Are you reading?",d:"询问对方在做什么 · 活动词汇",v:[{q:"\"阅读\"的英文是：",o:["A. read","B. reading","C. look","D. watch"],a:0},{q:"\"烹饪\"的英文是：",o:["A. make","B. cook","C. eat","D. food"],a:1},{q:"\"打扫\"的英文是：",o:["A. clean","B. wash","C. sweep","D. put"],a:0},{q:"\"写\"的英文是：",o:["A. draw","B. paint","C. write","D. read"],a:2},{q:"\"玩\"的英文是：",o:["A. do","B. have","C. make","D. play"],a:3}],g:[{q:"— ___ you reading?\n— Yes, I am.",o:["A. Is","B. Are","C. Do","D. Can"],a:1},{q:"— Are you cooking?\n— No, ___.",o:["A. I am","B. you aren't","C. I'm not","D. I don't"],a:2},{q:"— Is he cleaning?\n— ___, he is.",o:["A. No","B. Not","C. Yes","D. OK"],a:2},{q:"\"你在看书吗？\"的英文是：",o:["A. Do you reading?","B. Are you reading?","C. You are reading?","D. Is you reading?"],a:1},{q:"— Are they playing?\n— Yes, they ___.",o:["A. do","B. can","C. are","D. is"],a:2}],s:{w:["you","Are","writing","?"],a:"Are you writing ?"}};
+LESSONS[20]={t:"What are you doing?",e:"What are you doing?",d:"询问对方做什么 · 活动词汇",v:[{q:"\"生长；种植\"的英文是：",o:["A. plant","B. grow","C. water","D. dig"],a:1},{q:"\"光；灯\"的英文是：",o:["A. lamp","B. torch","C. light","D. shine"],a:2},{q:"\"碗\"的英文是：",o:["A. plate","B. cup","C. bowl","D. pot"],a:2},{q:"\"打乒乓球\"的英文是：",o:["A. play tennis","B. play table tennis","C. play badminton","D. play ping pong"],a:1},{q:"\"打羽毛球\"的英文是：",o:["A. play tennis","B. play volleyball","C. play badminton","D. play table tennis"],a:2}],g:[{q:"— What are you doing?\n— ___ watching TV.",o:["A. I am","B. I is","C. He is","D. She is"],a:0},{q:"— What ___ you doing?\n— I'm reading.",o:["A. is","B. am","C. are","D. be"],a:2},{q:"— What is he doing?\n— He ___ playing badminton.",o:["A. am","B. are","C. be","D. is"],a:3},{q:"— What is she doing?\n— ___ watching a film.",o:["A. He's","B. She's","C. They're","D. I'm"],a:1},{q:"\"watch\"的现在分词是：",o:["A. watchs","B. watchting","C. watching","D. watched"],a:2}],s:{w:["are","What","you","doing","?"],a:"What are you doing ?"}};
+LESSONS[21]={t:"综合复习",e:"全20课精华",d:"综合测试 · 冲刺提分",v:[{q:"\"看电影\"的英文是：",o:["A. watch TV","B. watch a film","C. see a show","D. look a movie"],a:1},{q:"\"碗\"的英文是：",o:["A. plate","B. cup","C. bowl","D. pot"],a:2},{q:"\"打乒乓球\"的英文是：",o:["A. play tennis","B. play table tennis","C. play badminton","D. play ping pong"],a:1},{q:"\"打羽毛球\"的英文是：",o:["A. play tennis","B. play volleyball","C. play badminton","D. play table tennis"],a:2},{q:"\"生长；种植\"的英文是：",o:["A. plant","B. grow","C. water","D. dig"],a:1}],g:[{q:"Can I use your ruler?\n— ___.",o:["A. Yes, I can.","B. Here you are.","C. You can use.","D. No problem."],a:1},{q:"— Whose balloon is this?\n— ___ my sister's.",o:["A. Its","B. It's","C. This is","D. That's"],a:1},{q:"— What day is it?\n— ___ Friday.",o:["A. This is","B. Today is","C. It's","D. That's"],a:2},{q:"— What are you doing?\n— I ___ playing table tennis.",o:["A. am","B. is","C. are","D. be"],a:0},{q:"— How much is this bowl?\n— ___ twelve yuan.",o:["A. That's","B. It's","C. They're","D. This is"],a:1}],s:{w:["is","She","watching","a","film","."],a:"She is watching a film ."}};
 
-function getProgress() {
-  const raw = localStorage.getItem('checkinProgress');
-  return raw ? JSON.parse(raw) : {};
+// ================ GLOBALS ================
+var day=null,vs=0,gs=0,sc=0,vd=0,gd=0,sd=0,st=0,pw=[];
+
+function RP(){
+  var done=0;
+  for(var i=1;i<=21;i++){var d=JSON.parse(localStorage.getItem("cd"+i)||"{}");if(d.s)done++;}
+  document.getElementById("doneCount").textContent=done;
+  document.getElementById("progressFraction").textContent=done;
+  document.getElementById("progressBar").style.width=Math.round(done/21*100)+"%";
+  var cc=document.getElementById("cardsContainer");
+  cc.innerHTML="";
+  for(var i=1;i<=21;i++){
+    var d=JSON.parse(localStorage.getItem("cd"+i)||"{}");
+    var L=LESSONS[i];
+    var div=document.createElement("div");
+    div.className="day-card"+(d.s?" done":"");
+    div.innerHTML='<div class="card-body">'+
+      '<div class="card-badge"><span class="badge-dot">Day'+i+'</span><span class="badge-text">'+(d.s?'已完成':'未打卡')+'</span></div>'+
+      '<div class="card-title">'+L.t+'</div>'+
+      '<div class="card-example">'+L.e+'</div>'+
+      '<div class="card-desc">'+L.d+'</div>'+
+      (d.s?'<span class="card-tag">✅ 已完成</span>':'')+
+      '</div>'+
+      '<div class="card-footer">'+
+      '<div class="card-check">'+(d.s?'✅':(d.p?d.p+'%':'—'))+'</div>'+
+      '<button class="card-btn">'+(d.s?'复习':'开始打卡')+'</button>'+
+      '</div>';
+    div.onclick=function(day){return function(){OM(day);}}(i);
+    cc.appendChild(div);
+  }
 }
 
-function renderCards() {
-  const progress = getProgress();
-  const done = Object.values(progress).filter(v => v === 'done').length;
-  const grid = document.getElementById('cardsGrid');
-  grid.innerHTML = '';
-
-  LESSONS.forEach(lesson => {
-    const isDone = progress[lesson.day] === 'done';
-    const card = document.createElement('a');
-    card.href = `day.html?day=${lesson.day}`;
-    card.className = `day-card${isDone ? ' done' : ''}`;
-
-    card.innerHTML = `
-      <div class="done-mark">✓</div>
-      <div class="day-badge">Day ${lesson.day}</div>
-      <div class="day-title">${lesson.title}</div>
-      <div class="day-subtitle">${lesson.subtitle}</div>
-      <div class="enter-btn">${isDone ? '再练一次' : '开始打卡'}</div>
-    `;
-    grid.appendChild(card);
+function OM(nd){
+  day=nd; var L=LESSONS[nd];
+  document.getElementById("modalTitle").textContent="Day "+nd+" · "+L.t;
+  document.getElementById("modalOverlay").classList.add("show");
+  vs=0;gs=0;sc=false;vd=0;gd=0;sd=false;st=Date.now();pw=[];
+  var b=document.getElementById("modalBody");
+  var h="";
+  h+='<div class="section-title"><span class="badge badge-vocab">词</span>词汇选择（'+L.v.length+'题）</div>';
+  L.v.forEach(function(q,i){
+    h+='<div class="q-card" id="vc'+i+'"><div class="q-text">'+(i+1)+'. '+q.q+'</div><div class="opts">';
+    q.o.forEach(function(o,j){h+='<div class="opt" onclick="PV('+i+','+j+')">'+o+'</div>';});
+    h+='</div><div class="feedback" id="fv'+i+'"></div></div>';
   });
-
-  // Update stats
-  document.getElementById('doneCount').textContent = done;
-  document.getElementById('progText').textContent = `${done} / 21 天`;
-  document.getElementById('progressBar').style.width = `${(done / 21) * 100}%`;
+  h+='<div class="section-title"><span class="badge badge-grammar">语</span>语法选择（'+L.g.length+'题）</div>';
+  L.g.forEach(function(q,i){
+    h+='<div class="q-card" id="gc'+i+'"><div class="q-text">'+(i+1)+'. '+q.q+'</div><div class="opts">';
+    q.o.forEach(function(o,j){h+='<div class="opt" onclick="PG('+i+','+j+')">'+o+'</div>';});
+    h+='</div><div class="feedback" id="fg'+i+'"></div></div>';
+  });
+  h+='<div class="section-title"><span class="badge badge-sentence">句</span>连词成句</div>';
+  h+='<div class="q-card" id="sCard"><div class="words-area" id="pA"></div><div class="words-area" id="poA"></div><div class="sentence-actions"><button class="btn btn-reset" onclick="RS()">重置</button><button class="btn btn-check" id="cSB" disabled onclick="CS()">检查</button></div><div class="feedback" id="fs"></div></div>';
+  h+='<div class="done-panel" id="DP"><div class="score-ring" id="SR">--</div><div style="font-size:16px;color:#333;margin-bottom:4px;">打卡完成！</div><div class="stats"><div class="stat-item"><div class="sn" id="sVocab">--</div><div class="sl">词汇正确</div></div><div class="stat-item"><div class="sn" id="sGrammar">--</div><div class="sl">语法正确</div></div><div class="stat-item"><div class="sn" id="sTime">--</div><div class="sl">用时(秒)</div></div></div><button class="btn-submit" onclick="SC()">📌 提交打卡</button></div>';
+  b.innerHTML=h;
+  IS();
 }
 
-renderCards();
+function CM(){document.getElementById("modalOverlay").classList.remove("show");day=null;RP();}
+
+function IS(){
+  var L=LESSONS[day],w=[].concat(L.s.w);
+  for(var i=w.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=w[i];w[i]=w[j];w[j]=t;}
+  var po=document.getElementById("poA"),pl=document.getElementById("pA"),cb=document.getElementById("cSB"),fb=document.getElementById("fs");
+  po.innerHTML="";pl.innerHTML="";pw=[];pl.classList.remove("filled");cb.disabled=true;fb.className="feedback";fb.textContent="";sd=false;sc=false;
+  w.forEach(function(w,idx){
+    var c=document.createElement("span");c.className="word-chip pool";c.textContent=w;
+    c.onclick=function(){AW(idx);};c.id="cp"+idx;po.appendChild(c);
+  });
+}
+function AW(idx){
+  var c=document.getElementById("cp"+idx);if(!c||c.classList.contains("used"))return;
+  c.classList.add("used");
+  var p=document.createElement("span");p.className="word-chip placed";p.textContent=c.textContent;
+  p.onclick=function(){RW(p,idx);};
+  document.getElementById("pA").appendChild(p);pw.push({e:p,i:idx});
+  document.getElementById("pA").classList.add("filled");
+  document.getElementById("cSB").disabled=pw.length!==LESSONS[day].s.w.length;
+}
+function RW(el,idx){el.remove();pw=pw.filter(function(p){return p.e!==el;});var c=document.getElementById("cp"+idx);if(c)c.classList.remove("used");if(!pw.length)document.getElementById("pA").classList.remove("filled");document.getElementById("cSB").disabled=true;}
+function RS(){IS();}
+function CS(){
+  if(sd)return;sd=true;var L=LESSONS[day];
+  var u=pw.map(function(p){return p.e.textContent;}).join(" ");
+  var fb=document.getElementById("fs");
+  if(u===L.s.a){sc=true;fb.className="feedback fb-ok show";fb.textContent="✅ 完全正确！";}
+  else{fb.className="feedback fb-err show";fb.textContent="❌ 正确答案："+L.s.a;}
+  document.getElementById("cSB").disabled=true;TF();
+}
+
+function PV(qi,oi){
+  var c=document.getElementById("vc"+qi);if(!c||c.dataset.d==="1")return;c.dataset.d="1";
+  var L=LESSONS[day],q=L.v[qi],os=c.querySelectorAll(".opt");
+  os.forEach(function(o,j){o.classList.add("dim");if(j===q.a)o.classList.add("correct");if(j===oi&&j!==q.a)o.classList.add("wrong");});
+  var fb=document.getElementById("fv"+qi);
+  if(oi===q.a){vs++;fb.className="feedback fb-ok show";fb.textContent="✅ 正确！";}
+  else{fb.className="feedback fb-err show";fb.textContent="❌ 正确答案："+q.o[q.a];}
+  vd++;TF();
+}
+function PG(qi,oi){
+  var c=document.getElementById("gc"+qi);if(!c||c.dataset.d==="1")return;c.dataset.d="1";
+  var L=LESSONS[day],q=L.g[qi],os=c.querySelectorAll(".opt");
+  os.forEach(function(o,j){o.classList.add("dim");if(j===q.a)o.classList.add("correct");if(j===oi&&j!==q.a)o.classList.add("wrong");});
+  var fb=document.getElementById("fg"+qi);
+  if(oi===q.a){gs++;fb.className="feedback fb-ok show";fb.textContent="✅ 正确！";}
+  else{fb.className="feedback fb-err show";fb.textContent="❌ 正确答案："+q.o[q.a];}
+  gd++;TF();
+}
+
+function TF(){
+  var L=LESSONS[day];
+  if(vd>=L.v.length&&gd>=L.g.length&&sd){
+    var tc=vs+gs+(sc?1:0),tq=L.v.length+L.g.length+1,el=Math.round((Date.now()-st)/1000),pct=Math.round(tc/tq*100);
+    var p=document.getElementById("DP");p.classList.add("show");
+    document.getElementById("SR").textContent=pct+"%";
+    document.getElementById("sVocab").textContent=vs+"/"+L.v.length;
+    document.getElementById("sGrammar").textContent=gs+"/"+L.g.length;
+    document.getElementById("sTime").textContent=el;
+    p.scrollIntoView({behavior:"smooth"});
+    var k="cd"+day;localStorage.setItem(k,JSON.stringify({s:false,p:pct,t:el,d:new Date().toISOString()}));
+  }
+}
+function SC(){
+  var k="cd"+day,ex=JSON.parse(localStorage.getItem(k)||"{}");
+  localStorage.setItem(k,JSON.stringify({s:true,p:ex.p||0,t:ex.t||0,d:ex.d||new Date().toISOString()}));
+  alert("✅ 打卡成功！");CM();
+}
+
+RP();
 </script>
 </body>
 </html>
