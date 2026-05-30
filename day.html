@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日打卡 · 猿辅导英语</title>
+<style>
+  :root {
+    --primary: #FF6B35;
+    --primary-light: #FF8C5A;
+    --secondary: #4ECDC4;
+    --bg: #FFF8F4;
+    --card-bg: #FFFFFF;
+    --text: #2D3142;
+    --text-light: #7B7F9E;
+    --done: #52C41A;
+    --wrong: #FF4D4F;
+    --shadow: 0 4px 16px rgba(255,107,53,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ── Top Bar ── */
+  .topbar {
+    background: linear-gradient(135deg, #FF6B35 0%, #FF4E4E 100%);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .back-btn {
+    color: #fff;
+    font-size: 20px;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .topbar-info { flex: 1; }
+  .topbar-title { color: #fff; font-size: 16px; font-weight: 700; }
+  .topbar-sub { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+  .topbar-day {
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── Progress Dots ── */
+  .q-progress {
+    padding: 14px 16px 6px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .q-dot {
+    width: 28px; height: 6px;
+    background: #FFD5C5;
+    border-radius: 3px;
+    transition: background 0.3s;
+    flex: 1;
+  }
+  .q-dot.answered { background: var(--primary); }
+  .q-dot.correct { background: var(--done); }
+  .q-dot.wrong { background: var(--wrong); }
+  .q-counter {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+
+  /* ── Question Card ── */
+  .q-area { padding: 12px 16px; }
+  .q-type-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .badge-vocab { background: #FFF0E6; color: #FF6B35; }
+  .badge-grammar { background: #E6F7FF; color: #1890FF; }
+  .badge-sentence { background: #F6FFED; color: #52C41A; }
+
+  .q-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 18px;
+    box-shadow: var(--shadow);
+    min-height: 200px;
+  }
+  .q-num {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+  .q-text em {
+    font-style: normal;
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary-light);
+  }
+
+  /* ── Options ── */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    background: #F8F8FB;
+    border: 2px solid #EAEAF0;
+    border-radius: 12px;
+    padding: 13px 16px;
+    font-size: 15px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--primary-light);
+    background: #FFF3EE;
+  }
+  .option-btn.selected { border-color: var(--primary); background: #FFF0E6; }
+  .option-btn.correct { border-color: var(--done); background: #F6FFED; color: #389E0D; }
+  .option-btn.wrong { border-color: var(--wrong); background: #FFF2F0; color: #CF1322; }
+  .option-btn:disabled { cursor: default; }
+  .opt-key {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: #EAEAF0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .option-btn.selected .opt-key { background: var(--primary); color: #fff; }
+  .option-btn.correct .opt-key { background: var(--done); color: #fff; }
+  .option-btn.wrong .opt-key { background: var(--wrong); color: #fff; }
+
+  /* ── Sentence Build ── */
+  .words-source {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .word-chip {
+    background: #F0F4FF;
+    border: 2px solid #D0DAFF;
+    color: #4060CC;
+    border-radius: 10px;
+    padding: 6px 13px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .word-chip:hover:not(.used) { background: #E0E8FF; border-color: #8899EE; }
+  .word-chip.used { opacity: 0.3; cursor: default; }
+  .sentence-area {
+    min-height: 52px;
+    background: #F8F8FB;
+    border: 2px dashed #DADADF;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .sentence-area:hover { border-color: var(--primary-light); }
+  .sentence-area.correct { border-color: var(--done); background: #F6FFED; }
+  .sentence-area.wrong { border-color: var(--wrong); background: #FFF2F0; }
+  .placed-chip {
+    background: #fff;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    border-radius: 10px;
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .placed-chip:hover { background: #FFF0E6; }
+  .hint-area {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+  .answer-tip {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: none;
+  }
+  .answer-tip.correct { background: #F6FFED; color: #389E0D; display: block; }
+  .answer-tip.wrong { background: #FFF2F0; color: #CF1322; display: block; }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid #F0F0F0;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    z-index: 99;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 13px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+  .nav-btn:active { transform: scale(0.97); }
+  .btn-next {
+    background: linear-gradient(135deg, #FF6B35, #FF4E4E);
+    color: #fff;
+  }
+  .btn-submit {
+    background: linear-gradient(135deg, #52C41A, #389E0D);
+    color: #fff;
+  }
+  .btn-prev {
+    background: #F0F0F5;
+    color: var(--text);
+    flex: 0 0 52px;
+  }
+
+  /* ── Result Screen ── */
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .result-screen.show { display: block; }
+  .result-emoji { font-size: 72px; margin-bottom: 12px; }
+  .result-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+  .result-sub { color: var(--text-light); font-size: 14px; line-height: 1.7; }
+  .score-ring {
+    width: 120px; height: 120px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: conic-gradient(#FF6B35 0deg, #FF6B35 var(--deg), #FFD5C5 var(--deg), #FFD5C5 360deg);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .score-ring::after {
+    content: '';
+    position: absolute;
+    width: 86px; height: 86px;
+    background: #fff;
+    border-radius: 50%;
+  }
+  .score-inner {
+    z-index: 2;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .result-details {
+    display: flex; justify-content: center; gap: 20px;
+    margin: 20px 0 30px;
+  }
+  .r-detail {
+    background: #F8F8FB;
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+  }
+  .r-detail-num { font-size: 20px; font-weight: 800; }
+  .r-detail-label { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+  .green { color: var(--done); }
+  .red { color: var(--wrong); }
+  .btn-done {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 12px;
+    padding: 15px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-done-primary { background: linear-gradient(135deg, #FF6B35, #FF4E4E); color: #fff; }
+  .btn-done-secondary { background: #F0F0F5; color: var(--text); }
+
+  /* ── Loading ── */
+  #loadingScreen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 999;
+    gap: 14px;
+  }
+  .spin {
+    width: 40px; height: 40px;
+    border: 4px solid #FFD5C5;
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="spin"></div>
+  <div style="color:var(--text-light);font-size:14px;">题目加载中…</div>
+</div>
+
+<div id="mainApp" style="display:none">
+
+  <div class="topbar">
+    <a href="index.html" class="back-btn">‹</a>
+    <div class="topbar-info">
+      <div class="topbar-title" id="lessonTitle">加载中…</div>
+      <div class="topbar-sub" id="lessonSub"></div>
+    </div>
+    <div class="topbar-day" id="dayBadge">Day --</div>
+  </div>
+
+  <div class="q-progress" id="qProgress"></div>
+
+  <div class="q-area" id="qArea"></div>
+
+  <div class="bottom-nav" id="bottomNav">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="prevQ()">‹</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="nextOrSubmit()">下一题</button>
+  </div>
+
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji">🎉</div>
+    <div class="result-title" id="resultTitle">打卡成功！</div>
+    <div class="result-sub" id="resultSub"></div>
+    <div class="score-ring" id="scoreRing">
+      <div class="score-inner" id="scoreInner">0/11</div>
+    </div>
+    <div class="result-details">
+      <div class="r-detail">
+        <div class="r-detail-num green" id="correctNum">0</div>
+        <div class="r-detail-label">答对</div>
+      </div>
+      <div class="r-detail">
+        <div class="r-detail-num red" id="wrongNum">0</div>
+        <div class="r-detail-label">答错</div>
+      </div>
+      <div class="r-detail">
+        <div class="r-detail-num" id="timeNum">0s</div>
+        <div class="r-detail-label">用时</div>
+      </div>
+    </div>
+    <button class="btn-done btn-done-primary" onclick="goHome()">返回首页 🏠</button>
+    <button class="btn-done btn-done-secondary" onclick="retryDay()">再练一次</button>
+  </div>
+
+</div>
+
+<script>
+// =============================================
+// 20天完整题目数据
+// =============================================
+const ALL_LESSONS = {
+
+// ══════════════════════════════════════════════
+// Day 1 · 请求许可 Can I use your...?
+// 语法：请求许可及回应 | 词汇：class, eraser, ruler, crayon, pencil case, use
+// ══════════════════════════════════════════════
+1: {
+  title: "请求许可 Can I...?", sub: "Can I use your...? · 文具词汇",
+  vocab: [
+    { q: ""橡皮" 的英文是：", opts: ["A. ruler", "B. eraser", "C. crayon", "D. pen"], ans: 1 },
+    { q: ""蜡笔" 的英文是：", opts: ["A. pencil", "B. ruler", "C. crayon", "D. pen"], ans: 2 },
+    { q: ""文具盒" 的英文是：", opts: ["A. schoolbag", "B. pencil case", "C. pencil box", "D. bag"], ans: 1 },
+    { q: ""尺子" 的英文是：", opts: ["A. eraser", "B. crayon", "C. ruler", "D. pen"], ans: 2 },
+    { q: ""使用" 的英文是：", opts: ["A. have", "B. get", "C. use", "D. take"], ans: 2 },
+  ],
+  grammar: [
+    { q: "— Can I use your eraser?\n— ___.", opts: ["A. Yes, you are.", "B. Here you are.", "C. You can.", "D. That's right."], ans: 1 },
+    { q: "— ___ I use your ruler?\n— Sure.", opts: ["A. May", "B. Would", "C. Can", "D. Will"], ans: 2 },
+    { q: "— Can I have a crayon?\n— ___.", opts: ["A. No, you can't.", "B. Yes, please.", "C. Here you are.", "D. Both B and C"], ans: 3 },
+    { q: "— Can I sit here? — ___, you can.", opts: ["A. Yes", "B. No", "C. Not", "D. Sorry"], ans: 0 },
+    { q: "— Can I ___ your pencil case? — Sure.", opts: ["A. have", "B. using", "C. uses", "D. use"], ans: 3 },
+  ],
+  sentence: { words: ["Can", "I", "your", "use", "eraser", "?"], answer: "Can I use your eraser ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 2 · have got 拥有句型
+// 语法：表达拥有某物 | 词汇：watch, bottle, toothbrush, handbag, raincoat, sweater
+// ══════════════════════════════════════════════
+2: {
+  title: "have got 拥有句型", sub: "I've got a... · 生活物品",
+  vocab: [
+    { q: ""手表" 的英文是：", opts: ["A. clock", "B. watch", "C. phone", "D. ring"], ans: 1 },
+    { q: ""牙刷" 的英文是：", opts: ["A. toothpaste", "B. brush", "C. toothbrush", "D. comb"], ans: 2 },
+    { q: ""手提包" 的英文是：", opts: ["A. backpack", "B. handbag", "C. suitcase", "D. pocket"], ans: 1 },
+    { q: ""雨衣" 的英文是：", opts: ["A. raincoat", "B. sweater", "C. jacket", "D. coat"], ans: 0 },
+    { q: ""毛衣" 的英文是：", opts: ["A. shirt", "B. coat", "C. raincoat", "D. sweater"], ans: 3 },
+  ],
+  grammar: [
+    { q: "I ___ a new watch.", opts: ["A. have got", "B. has got", "C. got have", "D. am got"], ans: 0 },
+    { q: "She ___ a blue handbag.", opts: ["A. have got", "B. has got", "C. is got", "D. got"], ans: 1 },
+    { q: "I've got ___ bottle.", opts: ["A. a", "B. an", "C. the", "D. some"], ans: 0 },
+    { q: "He's got ___ umbrella.", opts: ["A. a", "B. an", "C. the", "D. —"], ans: 1 },
+    { q: ""I've got" 是 ___ 的缩写。", opts: ["A. I am got", "B. I has got", "C. I have got", "D. I had got"], ans: 2 },
+  ],
+  sentence: { words: ["got", "I've", "a", "new", "raincoat", "."], answer: "I've got a new raincoat ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 3 · Have you got...? 一般疑问句
+// 语法：询问是否拥有 | 词汇：doll, ball, kite, phone, helicopter, motorbike
+// ══════════════════════════════════════════════
+3: {
+  title: "Have you got...?", sub: "一般疑问句·是否拥有 · 玩具",
+  vocab: [
+    { q: ""洋娃娃" 的英文是：", opts: ["A. toy", "B. doll", "C. ball", "D. bear"], ans: 1 },
+    { q: ""风筝" 的英文是：", opts: ["A. kite", "B. ball", "C. helicopter", "D. plane"], ans: 0 },
+    { q: ""直升机" 的英文是：", opts: ["A. plane", "B. kite", "C. helicopter", "D. rocket"], ans: 2 },
+    { q: ""摩托车" 的英文是：", opts: ["A. bicycle", "B. motorbike", "C. scooter", "D. car"], ans: 1 },
+    { q: ""电话/手机" 的英文是：", opts: ["A. computer", "B. tablet", "C. phone", "D. camera"], ans: 2 },
+  ],
+  grammar: [
+    { q: "___ you got a kite?\n— Yes, I ___.", opts: ["A. Have / have", "B. Has / have", "C. Have / has", "D. Do / have"], ans: 0 },
+    { q: "___ she got a doll?\n— No, she ___.", opts: ["A. Have / hasn't", "B. Has / hasn't", "C. Has / haven't", "D. Have / haven't"], ans: 1 },
+    { q: "Have you got ___ phone?\n— Yes, I have.", opts: ["A. a", "B. an", "C. some", "D. any"], ans: 0 },
+    { q: "— Has he got a motorbike? — No, he ___.", opts: ["A. haven't", "B. hasn't", "C. doesn't", "D. isn't"], ans: 1 },
+    { q: "— Have you got any balls? — Yes, I ___ three.", opts: ["A. has got", "B. have got", "C. am got", "D. got"], ans: 1 },
+  ],
+  sentence: { words: ["got", "Have", "you", "a", "kite", "?"], answer: "Have you got a kite ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 4 · I'd like some... 表达想吃/建议吃
+// 语法：I'd like / Have some | 词汇：meat, beef, soup, salad, bread, ice cream
+// ══════════════════════════════════════════════
+4: {
+  title: "I'd like some...", sub: "表达想吃/建议吃 · 食物词汇",
+  vocab: [
+    { q: ""牛肉" 的英文是：", opts: ["A. meat", "B. beef", "C. pork", "D. lamb"], ans: 1 },
+    { q: ""汤" 的英文是：", opts: ["A. juice", "B. water", "C. soup", "D. milk"], ans: 2 },
+    { q: ""沙拉" 的英文是：", opts: ["A. salad", "B. bread", "C. rice", "D. noodles"], ans: 0 },
+    { q: ""面包" 的英文是：", opts: ["A. cake", "B. bread", "C. biscuit", "D. toast"], ans: 1 },
+    { q: ""冰淇淋" 的英文是：", opts: ["A. cake", "B. candy", "C. ice cream", "D. chocolate"], ans: 2 },
+  ],
+  grammar: [
+    { q: "I'd like ___ soup, please.", opts: ["A. a", "B. an", "C. some", "D. any"], ans: 2 },
+    { q: ""I'd like" 是 ___ 的缩写。", opts: ["A. I would like", "B. I did like", "C. I am like", "D. I had like"], ans: 0 },
+    { q: "— Have ___ bread!\n— Thank you.", opts: ["A. a", "B. some", "C. any", "D. an"], ans: 1 },
+    { q: "I'd like some beef ___ salad.", opts: ["A. but", "B. or", "C. and", "D. with"], ans: 2 },
+    { q: "___ some ice cream! It's delicious.", opts: ["A. Has", "B. Have", "C. Having", "D. To have"], ans: 1 },
+  ],
+  sentence: { words: ["like", "I'd", "some", "beef", "and", "bread", "."], answer: "I'd like some beef and bread ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 5 · Would you like...? 邀请用餐
+// 语法：邀请用餐及应答 | 词汇：plate, candy, noodles, cupcake, dumplings, hot dog
+// ══════════════════════════════════════════════
+5: {
+  title: "Would you like...?", sub: "邀请用餐及应答 · 美食词汇",
+  vocab: [
+    { q: ""盘子" 的英文是：", opts: ["A. bowl", "B. cup", "C. plate", "D. pot"], ans: 2 },
+    { q: ""糖果" 的英文是：", opts: ["A. cake", "B. candy", "C. cookie", "D. chocolate"], ans: 1 },
+    { q: ""面条" 的英文是：", opts: ["A. rice", "B. bread", "C. noodles", "D. pasta"], ans: 2 },
+    { q: ""饺子" 的英文是：", opts: ["A. dumpling", "B. cupcake", "C. hot dog", "D. dumplings"], ans: 3 },
+    { q: ""热狗" 的英文是：", opts: ["A. hamburger", "B. sandwich", "C. hot dog", "D. pizza"], ans: 2 },
+  ],
+  grammar: [
+    { q: "— ___ you like some noodles?\n— Yes, please.", opts: ["A. Do", "B. Can", "C. Would", "D. Are"], ans: 2 },
+    { q: "— Would you like some cake?\n— ___.", opts: ["A. Yes, I would.", "B. Yes, please.", "C. No, thank you.", "D. Both B and C"], ans: 3 },
+    { q: "— Would you like ___ dumplings?\n— No, thank you.", opts: ["A. a", "B. an", "C. some", "D. any"], ans: 2 },
+    { q: "— ___ you like a cupcake? — Yes, please.", opts: ["A. Do", "B. Would", "C. Are", "D. Can"], ans: 1 },
+    { q: "Would you like some candy? 这句话的目的是：", opts: ["A. 询问对方能力", "B. 邀请对方吃东西", "C. 询问价格", "D. 表达命令"], ans: 1 },
+  ],
+  sentence: { words: ["you", "Would", "like", "some", "dumplings", "?"], answer: "Would you like some dumplings ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 6 · 感官动词 with结构
+// 语法：描述感官功能 | 词汇：smell, taste, touch, tongue, plane, smoke
+// ══════════════════════════════════════════════
+6: {
+  title: "感官动词 with结构", sub: "I see/hear with my... · 感官词汇",
+  vocab: [
+    { q: ""气味；闻" 的英文是：", opts: ["A. taste", "B. touch", "C. smell", "D. hear"], ans: 2 },
+    { q: ""味道；尝" 的英文是：", opts: ["A. smell", "B. taste", "C. touch", "D. see"], ans: 1 },
+    { q: ""触摸" 的英文是：", opts: ["A. smell", "B. taste", "C. touch", "D. hear"], ans: 2 },
+    { q: ""舌头" 的英文是：", opts: ["A. nose", "B. eye", "C. ear", "D. tongue"], ans: 3 },
+    { q: ""烟" 的英文是：", opts: ["A. cloud", "B. smoke", "C. fog", "D. dust"], ans: 1 },
+  ],
+  grammar: [
+    { q: "I see ___ my eyes.", opts: ["A. in", "B. by", "C. with", "D. use"], ans: 2 },
+    { q: "We hear ___ our ears.", opts: ["A. with", "B. by", "C. in", "D. use"], ans: 0 },
+    { q: "I smell ___ my nose.", opts: ["A. by", "B. in", "C. with", "D. to"], ans: 2 },
+    { q: "We taste food ___ our tongue.", opts: ["A. in", "B. with", "C. by", "D. on"], ans: 1 },
+    { q: "I touch things ___ my hands.", opts: ["A. with", "B. in", "C. by", "D. on"], ans: 0 },
+  ],
+  sentence: { words: ["I", "smell", "with", "my", "nose", "."], answer: "I smell with my nose ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 7 · What are these/those? 近处远处动物
+// 语法：名词复数询问 | 词汇：goat, snake, horse, hippo, lizard, jellyfish
+// ══════════════════════════════════════════════
+7: {
+  title: "What are these/those?", sub: "询问近处/远处动物 · 动物词汇",
+  vocab: [
+    { q: ""山羊" 的英文是：", opts: ["A. sheep", "B. cow", "C. goat", "D. pig"], ans: 2 },
+    { q: ""蛇" 的英文是：", opts: ["A. lizard", "B. snake", "C. crocodile", "D. frog"], ans: 1 },
+    { q: ""河马" 的英文是：", opts: ["A. rhino", "B. elephant", "C. hippo", "D. bear"], ans: 2 },
+    { q: ""蜥蜴" 的英文是：", opts: ["A. snake", "B. frog", "C. lizard", "D. turtle"], ans: 2 },
+    { q: ""水母" 的英文是：", opts: ["A. starfish", "B. jellyfish", "C. seahorse", "D. dolphin"], ans: 1 },
+  ],
+  grammar: [
+    { q: "— What are ___? (近处)\n— They're goats.", opts: ["A. this", "B. that", "C. these", "D. those"], ans: 2 },
+    { q: "— What are ___? (远处)\n— They're snakes.", opts: ["A. this", "B. that", "C. these", "D. those"], ans: 3 },
+    { q: "— What ___ these? — They're hippos.", opts: ["A. is", "B. are", "C. am", "D. be"], ans: 1 },
+    { q: "They're horses. → They're ___ (单数).", opts: ["A. a horse", "B. an horse", "C. horse", "D. the horse"], ans: 0 },
+    { q: "— What are those? — ___ lizards.", opts: ["A. It's", "B. This is", "C. They're", "D. That is"], ans: 2 },
+  ],
+  sentence: { words: ["are", "What", "those", "?"], answer: "What are those ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 8 · Whose...is this? 询问物品归属
+// 语法：询问所有权+颜色 | 词汇：robot, balloon, monster, dinosaur, card, chess
+// ══════════════════════════════════════════════
+8: {
+  title: "Whose...is this?", sub: "询问物品归属·描述颜色 · 玩具",
+  vocab: [
+    { q: ""机器人" 的英文是：", opts: ["A. robot", "B. monster", "C. alien", "D. droid"], ans: 0 },
+    { q: ""气球" 的英文是：", opts: ["A. kite", "B. balloon", "C. ball", "D. bubble"], ans: 1 },
+    { q: ""怪兽" 的英文是：", opts: ["A. robot", "B. dinosaur", "C. monster", "D. alien"], ans: 2 },
+    { q: ""恐龙" 的英文是：", opts: ["A. dragon", "B. monster", "C. dinosaur", "D. lizard"], ans: 2 },
+    { q: ""卡片" 的英文是：", opts: ["A. paper", "B. card", "C. chess", "D. photo"], ans: 1 },
+  ],
+  grammar: [
+    { q: "— ___ robot is this? — It's Tim's robot.", opts: ["A. Who", "B. What", "C. Whose", "D. Which"], ans: 2 },
+    { q: "— Whose balloon is this? — ___ Tim's balloon.", opts: ["A. It's", "B. Its", "C. They're", "D. This is"], ans: 0 },
+    { q: "— ___ robot is this? — His robot is red.", opts: ["A. What colour", "B. Whose", "C. What colour is his", "D. How"], ans: 2 },
+    { q: "Whose card is this? It's ___ card. (她的)", opts: ["A. she", "B. her", "C. hers", "D. his"], ans: 1 },
+    { q: "— Whose chess is it? — ___ my chess.", opts: ["A. It's", "B. Its", "C. Is", "D. This"], ans: 0 },
+  ],
+  sentence: { words: ["Whose", "dinosaur", "is", "this", "?"], answer: "Whose dinosaur is this ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 9 · Where is...? 询问人物位置
+// 语法：He's in the + 房间 | 词汇：bedroom, bathroom, dining room, living room, grandfather, grandmother
+// ══════════════════════════════════════════════
+9: {
+  title: "Where is...? 询问位置", sub: "He's in the + 房间 · 家居房间",
+  vocab: [
+    { q: ""卧室" 的英文是：", opts: ["A. bathroom", "B. bedroom", "C. living room", "D. dining room"], ans: 1 },
+    { q: ""浴室" 的英文是：", opts: ["A. bedroom", "B. toilet", "C. bathroom", "D. kitchen"], ans: 2 },
+    { q: ""餐厅" 的英文是：", opts: ["A. living room", "B. kitchen", "C. hall", "D. dining room"], ans: 3 },
+    { q: ""客厅" 的英文是：", opts: ["A. dining room", "B. living room", "C. bedroom", "D. bathroom"], ans: 1 },
+    { q: ""祖母/外婆" 的英文是：", opts: ["A. grandmother", "B. grandfather", "C. aunt", "D. mother"], ans: 0 },
+  ],
+  grammar: [
+    { q: "— ___ is your grandfather? — He's in the bedroom.", opts: ["A. What", "B. Who", "C. Where", "D. How"], ans: 2 },
+    { q: "— Where is Grandma? — ___ in the kitchen.", opts: ["A. She's", "B. He's", "C. It's", "D. They're"], ans: 0 },
+    { q: "He's in ___ bathroom.", opts: ["A. a", "B. an", "C. the", "D. —"], ans: 2 },
+    { q: "— Where are the children? — ___ in the living room.", opts: ["A. He's", "B. She's", "C. They're", "D. It's"], ans: 2 },
+    { q: "She is in the ___ room. (饭厅)", opts: ["A. living", "B. bed", "C. dining", "D. bath"], ans: 2 },
+  ],
+  sentence: { words: ["is", "Grandfather", "in", "the", "living", "room", "."], answer: "Grandfather is in the living room ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 10 · 现在进行时（肯定句）
+// 语法：I'm/She is/They are + doing | 词汇：skate, ski, play the guitar, play the piano, play basketball, play football
+// ══════════════════════════════════════════════
+10: {
+  title: "现在进行时（肯定句）", sub: "I'm playing... · 运动词汇",
+  vocab: [
+    { q: ""滑冰" 的英文是：", opts: ["A. ski", "B. skate", "C. swim", "D. cycle"], ans: 1 },
+    { q: ""滑雪" 的英文是：", opts: ["A. skate", "B. slide", "C. ski", "D. surf"], ans: 2 },
+    { q: ""弹吉他" 的英文是：", opts: ["A. play the piano", "B. play the guitar", "C. play the violin", "D. play chess"], ans: 1 },
+    { q: ""打篮球" 的英文是：", opts: ["A. play football", "B. play tennis", "C. play basketball", "D. play volleyball"], ans: 2 },
+    { q: ""play" 的现在分词是：", opts: ["A. plaing", "B. plays", "C. played", "D. playing"], ans: 3 },
+  ],
+  grammar: [
+    { q: "I'm ___ the guitar now.", opts: ["A. play", "B. plays", "C. playing", "D. played"], ans: 2 },
+    { q: "She ___ playing the piano.", opts: ["A. am", "B. is", "C. are", "D. be"], ans: 1 },
+    { q: "They ___ playing basketball.", opts: ["A. is", "B. am", "C. be", "D. are"], ans: 3 },
+    { q: ""I'm" 是 ___ 的缩写。", opts: ["A. I am", "B. I have", "C. I was", "D. I will"], ans: 0 },
+    { q: "He is ___ (skate) in the park.", opts: ["A. skate", "B. skates", "C. skating", "D. skated"], ans: 2 },
+  ],
+  sentence: { words: ["is", "She", "playing", "the", "piano", "."], answer: "She is playing the piano ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 11 · What day is it today?
+// 语法：询问星期几 | 词汇：Monday, Friday, Wednesday, Thursday, today, tomorrow
+// ══════════════════════════════════════════════
+11: {
+  title: "What day is it today?", sub: "询问星期几 · 星期词汇",
+  vocab: [
+    { q: ""星期一" 的英文是：", opts: ["A. Monday", "B. Tuesday", "C. Wednesday", "D. Thursday"], ans: 0 },
+    { q: ""星期三" 的英文是：", opts: ["A. Monday", "B. Tuesday", "C. Wednesday", "D. Friday"], ans: 2 },
+    { q: ""星期四" 的英文是：", opts: ["A. Tuesday", "B. Wednesday", "C. Thursday", "D. Friday"], ans: 2 },
+    { q: ""明天" 的英文是：", opts: ["A. today", "B. yesterday", "C. tomorrow", "D. now"], ans: 2 },
+    { q: ""今天" 的英文是：", opts: ["A. now", "B. today", "C. this day", "D. that day"], ans: 1 },
+  ],
+  grammar: [
+    { q: "— What ___ is it today? — It's Monday.", opts: ["A. time", "B. day", "C. date", "D. month"], ans: 1 },
+    { q: "— What day is it today? — ___ Wednesday.", opts: ["A. This is", "B. Today is", "C. It's", "D. That's"], ans: 2 },
+    { q: "Today is Friday. Tomorrow is ___.", opts: ["A. Thursday", "B. Saturday", "C. Sunday", "D. Monday"], ans: 1 },
+    { q: "Today is Monday. Yesterday was ___.", opts: ["A. Tuesday", "B. Sunday", "C. Saturday", "D. Wednesday"], ans: 1 },
+    { q: "— ___ day is it? — It's Thursday.", opts: ["A. Which", "B. What", "C. How", "D. When"], ans: 1 },
+  ],
+  sentence: { words: ["day", "What", "is", "it", "today", "?"], answer: "What day is it today ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 12 · I have (science) on (Monday)
+// 语法：have + 学科 + on + 星期 | 词汇：art, Chinese, maths, science, computer, lesson
+// ══════════════════════════════════════════════
+12: {
+  title: "课程安排 have...on...", sub: "I have science on Monday · 学科词汇",
+  vocab: [
+    { q: ""美术" 的英文是：", opts: ["A. music", "B. PE", "C. art", "D. drama"], ans: 2 },
+    { q: ""数学" 的英文是：", opts: ["A. science", "B. maths", "C. English", "D. Chinese"], ans: 1 },
+    { q: ""科学" 的英文是：", opts: ["A. maths", "B. computer", "C. science", "D. nature"], ans: 2 },
+    { q: ""计算机课" 的英文是：", opts: ["A. computer", "B. science", "C. art", "D. maths"], ans: 0 },
+    { q: ""一节课" 的英文是：", opts: ["A. class", "B. lesson", "C. subject", "D. period"], ans: 1 },
+  ],
+  grammar: [
+    { q: "I have Chinese ___ Monday.", opts: ["A. in", "B. at", "C. on", "D. for"], ans: 2 },
+    { q: "We ___ maths on Wednesday.", opts: ["A. has", "B. have", "C. are", "D. is"], ans: 1 },
+    { q: "She has art ___ Friday.", opts: ["A. on", "B. in", "C. at", "D. of"], ans: 0 },
+    { q: "— What do you have on Monday? — I have ___.", opts: ["A. on maths", "B. maths on Monday", "C. maths", "D. a maths"], ans: 2 },
+    { q: "I ___ (have) computer on Thursday.", opts: ["A. has", "B. have", "C. having", "D. am have"], ans: 1 },
+  ],
+  sentence: { words: ["have", "I", "science", "on", "Monday", "."], answer: "I have science on Monday ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 13 · Who is that...? 询问远处人物身份
+// 语法：询问人物身份 | 词汇：woman, student, classmate, healthy, exercise, afternoon
+// ══════════════════════════════════════════════
+13: {
+  title: "Who is that...?", sub: "询问远处人物身份 · 人物词汇",
+  vocab: [
+    { q: ""女人；妇女" 的英文是：", opts: ["A. girl", "B. lady", "C. woman", "D. female"], ans: 2 },
+    { q: ""同班同学" 的英文是：", opts: ["A. friend", "B. classmate", "C. student", "D. partner"], ans: 1 },
+    { q: ""健康的" 的英文是：", opts: ["A. happy", "B. healthy", "C. helpful", "D. honest"], ans: 1 },
+    { q: ""锻炼" 作名词的英文是：", opts: ["A. exercise", "B. sport", "C. activity", "D. training"], ans: 0 },
+    { q: ""下午" 的英文是：", opts: ["A. morning", "B. evening", "C. noon", "D. afternoon"], ans: 3 },
+  ],
+  grammar: [
+    { q: "— ___ is that woman? — That's my teacher.", opts: ["A. What", "B. Which", "C. Who", "D. Where"], ans: 2 },
+    { q: "— Who is that? — ___ my classmate.", opts: ["A. He's / She's", "B. That's / This is", "C. That's", "D. All of the above"], ans: 3 },
+    { q: "— Who ___ those students? — They're from Class 3.", opts: ["A. is", "B. am", "C. are", "D. be"], ans: 2 },
+    { q: "That ___ my grandmother. She's healthy.", opts: ["A. am", "B. is", "C. are", "D. be"], ans: 1 },
+    { q: "— Who is that man? — ___ my grandfather.", opts: ["A. It's", "B. He's", "C. She's", "D. They're"], ans: 1 },
+  ],
+  sentence: { words: ["is", "Who", "that", "woman", "?"], answer: "Who is that woman ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 14 · How many...are there? 数量询问
+// 语法：how many + there be 复数 | 词汇：eleven, twelve, thirteen, fourteen, fifteen, count
+// ══════════════════════════════════════════════
+14: {
+  title: "How many...are there?", sub: "数量询问+there be · 数字11-15",
+  vocab: [
+    { q: ""十一" 的英文是：", opts: ["A. twelve", "B. eleven", "C. thirteen", "D. ten"], ans: 1 },
+    { q: ""十二" 的英文是：", opts: ["A. eleven", "B. thirteen", "C. twelve", "D. fourteen"], ans: 2 },
+    { q: ""十三" 的英文是：", opts: ["A. thirty", "B. thirteen", "C. twelve", "D. fifteen"], ans: 1 },
+    { q: ""十四" 的英文是：", opts: ["A. forty", "B. fifteen", "C. fourteen", "D. sixteen"], ans: 2 },
+    { q: ""数数" 的英文是：", opts: ["A. count", "B. number", "C. add", "D. write"], ans: 0 },
+  ],
+  grammar: [
+    { q: "— How ___ rabbits are there? — There are twelve.", opts: ["A. much", "B. many", "C. a lot", "D. some"], ans: 1 },
+    { q: "— How many apples are there? — There ___ fifteen.", opts: ["A. is", "B. am", "C. are", "D. be"], ans: 2 },
+    { q: "How many ___ are there? (猫)", opts: ["A. cat", "B. a cat", "C. cats", "D. the cat"], ans: 2 },
+    { q: "There are ___ books on the desk. (数字13)", opts: ["A. twelve", "B. thirteen", "C. fourteen", "D. fifteen"], ans: 1 },
+    { q: "___ many students are there in your class?", opts: ["A. What", "B. How", "C. Which", "D. Who"], ans: 1 },
+  ],
+  sentence: { words: ["many", "How", "are", "there", "?"], answer: "How many are there ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 15 · How much is this? 询问价格
+// 语法：how much 询问价格 | 词汇：sixteen, seventeen, eighteen, nineteen, twenty, expensive
+// ══════════════════════════════════════════════
+15: {
+  title: "How much is this?", sub: "询问价格 · 数字16-20",
+  vocab: [
+    { q: ""十六" 的英文是：", opts: ["A. fifteen", "B. seventeen", "C. sixteen", "D. eighteen"], ans: 2 },
+    { q: ""十七" 的英文是：", opts: ["A. sixteen", "B. seventeen", "C. eighteen", "D. nineteen"], ans: 1 },
+    { q: ""十九" 的英文是：", opts: ["A. eighteen", "B. twenty", "C. seventeen", "D. nineteen"], ans: 3 },
+    { q: ""二十" 的英文是：", opts: ["A. twelve", "B. twenty", "C. nineteen", "D. eighteen"], ans: 1 },
+    { q: ""贵的" 的英文是：", opts: ["A. cheap", "B. expensive", "C. free", "D. costly"], ans: 1 },
+  ],
+  grammar: [
+    { q: "— ___ much is this? — It's eighteen yuan.", opts: ["A. What", "B. How", "C. Which", "D. Where"], ans: 1 },
+    { q: "— How much is this hat? — ___ twenty yuan.", opts: ["A. They're", "B. That's", "C. It's", "D. This is"], ans: 2 },
+    { q: "It's too ___. I don't want it. (贵)", opts: ["A. cheap", "B. free", "C. expensive", "D. small"], ans: 2 },
+    { q: "— How much ___ these shoes? — They're eighty yuan.", opts: ["A. is", "B. are", "C. am", "D. be"], ans: 1 },
+    { q: "This book is ___ yuan. (17)", opts: ["A. sixteen", "B. eighteen", "C. seventeen", "D. nineteen"], ans: 2 },
+  ],
+  sentence: { words: ["How", "much", "is", "this", "?"], answer: "How much is this ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 16 · What time is it? 询问时间
+// 语法：询问时间+It's time to/for | 词汇：time, do homework, have breakfast, go to school, go home, walk the dog
+// ══════════════════════════════════════════════
+16: {
+  title: "What time is it?", sub: "询问时间·该做某事 · 日常活动",
+  vocab: [
+    { q: ""做作业" 的英文是：", opts: ["A. do homework", "B. do housework", "C. do exercise", "D. do reading"], ans: 0 },
+    { q: ""吃早餐" 的英文是：", opts: ["A. have lunch", "B. have dinner", "C. have breakfast", "D. have a snack"], ans: 2 },
+    { q: ""上学" 的英文是：", opts: ["A. go to bed", "B. go home", "C. go shopping", "D. go to school"], ans: 3 },
+    { q: ""回家" 的英文是：", opts: ["A. go to school", "B. go home", "C. come home", "D. go out"], ans: 1 },
+    { q: ""遛狗" 的英文是：", opts: ["A. feed the dog", "B. walk the dog", "C. play with the dog", "D. wash the dog"], ans: 1 },
+  ],
+  grammar: [
+    { q: "— What time ___ it? — It's seven o'clock.", opts: ["A. are", "B. am", "C. is", "D. be"], ans: 2 },
+    { q: "It's time ___ go to school.", opts: ["A. for", "B. to", "C. of", "D. at"], ans: 1 },
+    { q: "It's time ___ breakfast.", opts: ["A. to", "B. in", "C. for", "D. at"], ans: 2 },
+    { q: "— What time is it? — ___ eight o'clock.", opts: ["A. That's", "B. This is", "C. It's", "D. They're"], ans: 2 },
+    { q: "It's 7:30. It's time to ___ homework.", opts: ["A. does", "B. doing", "C. do", "D. did"], ans: 2 },
+  ],
+  sentence: { words: ["time", "It's", "to", "go", "home", "."], answer: "It's time to go home ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 17 · What is he/she doing? 特殊疑问句
+// 语法：询问他人正在做什么 | 词汇：throw, clap, pack, listen to music, sing songs, tell a story
+// ══════════════════════════════════════════════
+17: {
+  title: "What is he/she doing?", sub: "询问他人正在做什么 · 动作词汇",
+  vocab: [
+    { q: ""扔；投" 的英文是：", opts: ["A. catch", "B. kick", "C. throw", "D. hit"], ans: 2 },
+    { q: ""鼓掌" 的英文是：", opts: ["A. clap", "B. wave", "C. nod", "D. stamp"], ans: 0 },
+    { q: ""收拾；打包" 的英文是：", opts: ["A. clean", "B. pack", "C. tidy", "D. sort"], ans: 1 },
+    { q: ""听音乐" 的英文是：", opts: ["A. play music", "B. sing songs", "C. listen to music", "D. watch music"], ans: 2 },
+    { q: ""讲故事" 的英文是：", opts: ["A. read a story", "B. write a story", "C. hear a story", "D. tell a story"], ans: 3 },
+  ],
+  grammar: [
+    { q: "— What ___ he doing? — He's clapping.", opts: ["A. are", "B. is", "C. am", "D. be"], ans: 1 },
+    { q: "— What is she doing? — She ___ listening to music.", opts: ["A. are", "B. am", "C. is", "D. be"], ans: 2 },
+    { q: "— ___ is he doing? — He's telling a story.", opts: ["A. Where", "B. Who", "C. What", "D. How"], ans: 2 },
+    { q: "She is ___ (sing) songs.", opts: ["A. sing", "B. sings", "C. singing", "D. singed"], ans: 2 },
+    { q: "He is ___ a ball.", opts: ["A. throw", "B. throwing", "C. throws", "D. throwed"], ans: 1 },
+  ],
+  sentence: { words: ["is", "What", "he", "doing", "?"], answer: "What is he doing ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 18 · There be + 方位介词
+// 语法：方位介词 in front of, under, behind, next to | 词汇：wall, picture, mirror, bookcase, cupboard, towel
+// ══════════════════════════════════════════════
+18: {
+  title: "There be + 方位介词", sub: "in front of/behind/next to · 家居",
+  vocab: [
+    { q: ""镜子" 的英文是：", opts: ["A. window", "B. mirror", "C. picture", "D. frame"], ans: 1 },
+    { q: ""书架" 的英文是：", opts: ["A. bookcase", "B. cupboard", "C. shelf", "D. cabinet"], ans: 0 },
+    { q: ""碗柜；橱柜" 的英文是：", opts: ["A. bookcase", "B. drawer", "C. cupboard", "D. closet"], ans: 2 },
+    { q: ""毛巾" 的英文是：", opts: ["A. cloth", "B. towel", "C. blanket", "D. tissue"], ans: 1 },
+    { q: ""…的旁边" 的英文是：", opts: ["A. behind", "B. in front of", "C. next to", "D. under"], ans: 2 },
+  ],
+  grammar: [
+    { q: "There's a mirror ___ the wall.", opts: ["A. in", "B. on", "C. at", "D. under"], ans: 1 },
+    { q: "There are books ___ the bookcase.", opts: ["A. on", "B. in", "C. under", "D. behind"], ans: 1 },
+    { q: "The cat is ___ the cupboard. (在…前面)", opts: ["A. behind", "B. next to", "C. under", "D. in front of"], ans: 3 },
+    { q: "The towel is ___ the door. (在…旁边)", opts: ["A. next to", "B. behind", "C. in front of", "D. over"], ans: 0 },
+    { q: "There ___ a picture on the wall.", opts: ["A. are", "B. is", "C. am", "D. be"], ans: 1 },
+  ],
+  sentence: { words: ["is", "There", "a", "mirror", "on", "the", "wall", "."], answer: "There is a mirror on the wall ." }
+},
+
+// ══════════════════════════════════════════════
+// Day 19 · Are you...ing? 进行时疑问句
+// 语法：询问是否正在做某事及肯否定回答 | 词汇：radio, plant, fly a kite, ride a bike, watch TV, take a photo
+// ══════════════════════════════════════════════
+19: {
+  title: "Are you...ing? 进行时", sub: "询问是否正在做某事 · 活动词汇",
+  vocab: [
+    { q: ""收音机" 的英文是：", opts: ["A. television", "B. radio", "C. speaker", "D. microphone"], ans: 1 },
+    { q: ""种植" 的英文是：", opts: ["A. grow", "B. plant", "C. water", "D. dig"], ans: 1 },
+    { q: ""放风筝" 的英文是：", opts: ["A. fly a plane", "B. fly a balloon", "C. fly a kite", "D. fly a bird"], ans: 2 },
+    { q: ""骑自行车" 的英文是：", opts: ["A. ride a horse", "B. ride a motorbike", "C. ride a bike", "D. ride a bus"], ans: 2 },
+    { q: ""拍照" 的英文是：", opts: ["A. draw a picture", "B. take a photo", "C. watch TV", "D. paint a picture"], ans: 1 },
+  ],
+  grammar: [
+    { q: "— ___ you riding a bike? — Yes, I am.", opts: ["A. Is", "B. Are", "C. Am", "D. Do"], ans: 1 },
+    { q: "— Are you watching TV? — ___, I'm not.", opts: ["A. Yes", "B. No", "C. Not", "D. Sorry"], ans: 1 },
+    { q: "— Is he flying a kite? — Yes, ___ is.", opts: ["A. I", "B. she", "C. he", "D. they"], ans: 2 },
+    { q: "— Are they ___ photos? — Yes, they are.", opts: ["A. take", "B. takes", "C. taking", "D. taken"], ans: 2 },
+    { q: "— Are you listening to the radio?\n— No, I ___.", opts: ["A. am not", "B. isn't", "C. aren't", "D. not am"], ans: 0 },
+  ],
+  sentence: { words: ["you", "Are", "flying", "a", "kite", "?"], answer: "Are you flying a kite ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 20 · What are you doing? 询问对方正在做什么并回答
+// 语法：What are you doing? / He/She is + v-ing | 词汇：grow, light, bowl, play table tennis, play badminton, watch a film
+// ══════════════════════════════════════════════
+20: {
+  title: "What are you doing?", sub: "询问对方正在做什么并回答 · 活动词汇",
+  vocab: [
+    { q: ""生长；种植" 的英文是：", opts: ["A. plant", "B. grow", "C. water", "D. dig"], ans: 1 },
+    { q: ""光；灯" 的英文是：", opts: ["A. lamp", "B. torch", "C. light", "D. shine"], ans: 2 },
+    { q: ""碗" 的英文是：", opts: ["A. plate", "B. cup", "C. bowl", "D. pot"], ans: 2 },
+    { q: ""打乒乓球" 的英文是：", opts: ["A. play tennis", "B. play table tennis", "C. play badminton", "D. play ping pong"], ans: 1 },
+    { q: ""打羽毛球" 的英文是：", opts: ["A. play tennis", "B. play volleyball", "C. play badminton", "D. play table tennis"], ans: 2 },
+  ],
+  grammar: [
+    { q: "— What are you doing?\n— ___ watching TV.", opts: ["A. I am", "B. I is", "C. He is", "D. She is"], ans: 0 },
+    { q: "— What ___ you doing? — I'm reading.", opts: ["A. is", "B. am", "C. are", "D. be"], ans: 2 },
+    { q: "— What is he doing? — He ___ playing badminton.", opts: ["A. am", "B. are", "C. be", "D. is"], ans: 3 },
+    { q: "— What is she doing? — ___ watching a film.", opts: ["A. He's", "B. She's", "C. They're", "D. I'm"], ans: 1 },
+    { q: ""watch" 的现在分词是：", opts: ["A. watchs", "B. watchting", "C. watching", "D. watched"], ans: 2 },
+  ],
+  sentence: { words: ["are", "What", "you", "doing", "?"], answer: "What are you doing ?" }
+},
+
+// ══════════════════════════════════════════════
+// Day 21 · 综合复习
+// 20课精华汇总 | 词汇：综合考查前20课核心词汇
+// ══════════════════════════════════════════════
+21: {
+  title: "综合复习", sub: "20课精华汇总 · 冲刺提分",
+  vocab: [
+    { q: ""看电影" 的英文是：", opts: ["A. watch TV", "B. watch a film", "C. see a show", "D. look a movie"], ans: 1 },
+    { q: ""碗" 的英文是：", opts: ["A. plate", "B. cup", "C. bowl", "D. pot"], ans: 2 },
+    { q: ""打乒乓球" 的英文是：", opts: ["A. play tennis", "B. play table tennis", "C. play badminton", "D. play ping pong"], ans: 1 },
+    { q: ""打羽毛球" 的英文是：", opts: ["A. play tennis", "B. play volleyball", "C. play badminton", "D. play table tennis"], ans: 2 },
+    { q: ""生长；种植" 的英文是：", opts: ["A. plant", "B. grow", "C. water", "D. dig"], ans: 1 },
+  ],
+  grammar: [
+    { q: "Can I use your ruler? — ___.", opts: ["A. Yes, I can.", "B. Here you are.", "C. You can use.", "D. No problem."], ans: 1 },
+    { q: "— Whose balloon is this? — ___ my sister's.", opts: ["A. Its", "B. It's", "C. This is", "D. That's"], ans: 1 },
+    { q: "— What day is it? — ___ Friday.", opts: ["A. This is", "B. Today is", "C. It's", "D. That's"], ans: 2 },
+    { q: "— What are you doing? — I ___ playing table tennis.", opts: ["A. am", "B. is", "C. are", "D. be"], ans: 0 },
+    { q: "— How much is this bowl? — ___ twelve yuan.", opts: ["A. That's", "B. It's", "C. They're", "D. This is"], ans: 1 },
+  ],
+  sentence: { words: ["is", "She", "watching", "a", "film", "."], answer: "She is watching a film ." }
+}
+
+}; // END ALL_LESSONS
+
+// =============================================
+// App State
+// =============================================
+let dayNum = 1;
+let lesson = null;
+let questions = [];
+let currentQ = 0;
+let answers = {};
+let startTime = Date.now();
+
+// =============================================
+// Init
+// =============================================
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  dayNum = parseInt(params.get('day')) || 1;
+  lesson = ALL_LESSONS[dayNum];
+  if (!lesson) { window.location.href = 'index.html'; return; }
+
+  document.getElementById('lessonTitle').textContent = lesson.title;
+  document.getElementById('lessonSub').textContent = lesson.sub;
+  document.getElementById('dayBadge').textContent = `Day ${dayNum}`;
+  document.title = `Day ${dayNum} · ${lesson.title}`;
+
+  // Build question list
+  questions = [];
+  lesson.vocab.forEach((q, i) => questions.push({ type: 'vocab', ...q, idx: i }));
+  lesson.grammar.forEach((q, i) => questions.push({ type: 'grammar', ...q, idx: i }));
+  questions.push({ type: 'sentence', ...lesson.sentence });
+
+  startTime = Date.now();
+  renderQ(0);
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+}
+
+// =============================================
+// Render Question
+// =============================================
+function renderQ(idx) {
+  currentQ = idx;
+  const q = questions[idx];
+  const isLast = idx === questions.length - 1;
+
+  // Progress dots
+  const pEl = document.getElementById('qProgress');
+  pEl.innerHTML = questions.map((qq, i) => {
+    let cls = '';
+    if (answers[i] !== undefined) {
+      cls = answers[i].correct ? 'correct' : 'wrong';
+    } else if (i === idx) cls = 'answered';
+    return `<div class="q-dot ${cls}"></div>`;
+  }).join('') + `<span class="q-counter">${idx + 1}/${questions.length}</span>`;
+
+  // Type badge
+  const badgeMap = { vocab: '词汇题', grammar: '语法题', sentence: '连词成句' };
+  const badgeClass = { vocab: 'badge-vocab', grammar: 'badge-grammar', sentence: 'badge-sentence' };
+
+  const qArea = document.getElementById('qArea');
+  qArea.innerHTML = '';
+
+  const badge = document.createElement('div');
+  badge.className = `q-type-badge ${badgeClass[q.type]}`;
+  badge.textContent = badgeMap[q.type];
+  qArea.appendChild(badge);
+
+  const card = document.createElement('div');
+  card.className = 'q-card';
+
+  if (q.type === 'sentence') {
+    renderSentence(card, q, idx);
+  } else {
+    renderMC(card, q, idx);
+  }
+
+  qArea.appendChild(card);
+
+  // Bottom nav
+  const btnNext = document.getElementById('btnNext');
+  const btnPrev = document.getElementById('btnPrev');
+  btnPrev.style.display = idx === 0 ? 'none' : 'block';
+  btnNext.textContent = isLast ? '提交打卡' : '下一题';
+  btnNext.className = `nav-btn ${isLast ? 'btn-submit' : 'btn-next'}`;
+}
+
+// ── Multiple Choice ──
+function renderMC(card, q, idx) {
+  const done = answers[idx] !== undefined;
+  const userAns = done ? answers[idx].userAns : -1;
+
+  card.innerHTML = `
+    <div class="q-num">第 ${idx + 1} 题</div>
+    <div class="q-text">${q.q}</div>
+    <div class="options" id="opts"></div>
+    <div class="answer-tip" id="tip"></div>
+  `;
+
+  const opts = card.querySelector('#opts');
+  q.opts.forEach((opt, oi) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.disabled = done;
+    let cls = '';
+    if (done) {
+      if (oi === q.ans) cls = 'correct';
+      else if (oi === userAns) cls = 'wrong';
+    }
+    btn.className = `option-btn ${cls}`;
+    btn.innerHTML = `<span class="opt-key">${String.fromCharCode(65 + oi)}</span>${opt}`;
+    if (!done) btn.onclick = () => selectOption(idx, oi, q.ans);
+    opts.appendChild(btn);
+  });
+
+  if (done) {
+    const tip = card.querySelector('#tip');
+    if (answers[idx].correct) {
+      tip.className = 'answer-tip correct';
+      tip.textContent = '✓ 回答正确！';
+    } else {
+      tip.className = 'answer-tip wrong';
+      tip.textContent = `✗ 正确答案是 ${q.opts[q.ans]}`;
+    }
+  }
+}
+
+function selectOption(qIdx, chosen, correct) {
+  const isCorrect = chosen === correct;
+  answers[qIdx] = { userAns: chosen, correct: isCorrect };
+  renderQ(qIdx);
+}
+
+// ── Sentence Builder ──
+let placedWords = [];
+function renderSentence(card, q, idx) {
+  const done = answers[idx] !== undefined;
+  if (!done) placedWords = [];
+
+  const shuffled = done ? null : shuffle([...q.words]);
+
+  card.innerHTML = `
+    <div class="q-num">第 ${idx + 1} 题（连词成句）</div>
+    <div class="q-text">将下面的单词排列成正确的句子：</div>
+    <div class="sentence-area ${done ? (answers[idx].correct ? 'correct' : 'wrong') : ''}" id="sentArea"></div>
+    <div class="hint-area">${done ? '' : '点击单词加入句子，点击句子中的单词可移除'}</div>
+    <div class="answer-tip" id="sentTip"></div>
+    ${!done ? `<div class="words-source" id="wordSource"></div>` : ''}
+  `;
+
+  const sentArea = card.querySelector('#sentArea');
+
+  if (done) {
+    const displayWords = answers[idx].userAns;
+    displayWords.forEach(w => {
+      const chip = document.createElement('span');
+      chip.className = 'placed-chip';
+      chip.style.cursor = 'default';
+      chip.textContent = w;
+      sentArea.appendChild(chip);
+    });
+    const tip = card.querySelector('#sentTip');
+    if (answers[idx].correct) {
+      tip.className = 'answer-tip correct';
+      tip.textContent = '✓ 句子正确！';
+    } else {
+      tip.className = 'answer-tip wrong';
+      tip.textContent = `✗ 正确句子：${q.answer}`;
+    }
+    return;
+  }
+
+  // Render source chips
+  const src = card.querySelector('#wordSource');
+  shuffled.forEach((w, wi) => {
+    const chip = document.createElement('span');
+    chip.className = 'word-chip';
+    chip.dataset.wi = wi;
+    chip.textContent = w;
+    chip.onclick = () => addWord(w, wi, chip, sentArea, idx, q);
+    src.appendChild(chip);
+  });
+
+  // Render placed
+  function refreshPlaced() {
+    sentArea.innerHTML = '';
+    placedWords.forEach((item, pi) => {
+      const chip = document.createElement('span');
+      chip.className = 'placed-chip';
+      chip.textContent = item.word;
+      chip.onclick = () => removeWord(pi, src, sentArea, idx, q);
+      sentArea.appendChild(chip);
+    });
+  }
+  refreshPlaced();
+
+  // save refresh fn
+  sentArea._refresh = refreshPlaced;
+}
+
+function addWord(word, wi, chipEl, sentArea, qIdx, q) {
+  chipEl.classList.add('used');
+  chipEl.onclick = null;
+  placedWords.push({ word, wi, chipEl });
+  sentArea._refresh();
+}
+
+function removeWord(pi, src, sentArea, qIdx, q) {
+  const item = placedWords[pi];
+  placedWords.splice(pi, 1);
+  item.chipEl.classList.remove('used');
+  item.chipEl.onclick = () => addWord(item.word, item.wi, item.chipEl, sentArea, qIdx, q);
+  sentArea._refresh();
+}
+
+function submitSentence(qIdx, q) {
+  if (placedWords.length === 0) { alert('请先排列单词！'); return; }
+  const userSent = placedWords.map(i => i.word).join(' ');
+  const isCorrect = userSent === q.answer;
+  answers[qIdx] = { userAns: placedWords.map(i => i.word), correct: isCorrect };
+  renderQ(qIdx);
+}
+
+// =============================================
+// Navigation
+// =============================================
+function nextOrSubmit() {
+  const q = questions[currentQ];
+  if (answers[currentQ] === undefined) {
+    if (q.type === 'sentence') {
+      submitSentence(currentQ, q);
+      return;
+    } else {
+      alert('请先选择答案！');
+      return;
+    }
+  }
+  if (currentQ === questions.length - 1) {
+    showResult();
+  } else {
+    renderQ(currentQ + 1);
+  }
+}
+
+function prevQ() {
+  if (currentQ > 0) renderQ(currentQ - 1);
+}
+
+// =============================================
+// Results
+// =============================================
+function showResult() {
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const correct = Object.values(answers).filter(a => a.correct).length;
+  const wrong = questions.length - correct;
+  const score = Math.round((correct / questions.length) * 100);
+
+  document.getElementById('qArea').style.display = 'none';
+  document.getElementById('qProgress').style.display = 'none';
+  document.getElementById('bottomNav').style.display = 'none';
+
+  const rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+
+  let emoji = '😊', title = '继续加油！';
+  if (score >= 90) { emoji = '🎉'; title = '超棒！满分在望！'; }
+  else if (score >= 70) { emoji = '👍'; title = '不错哦，继续努力！'; }
+  else if (score >= 50) { emoji = '💪'; title = '加油，进步空间很大！'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSub').textContent = `Day ${dayNum} · ${lesson.title} 打卡完成！`;
+
+  document.getElementById('correctNum').textContent = correct;
+  document.getElementById('wrongNum').textContent = wrong;
+  document.getElementById('timeNum').textContent = elapsed < 60 ? `${elapsed}s` : `${Math.floor(elapsed/60)}m${elapsed%60}s`;
+  document.getElementById('scoreInner').textContent = `${score}%`;
+  const deg = Math.round((score / 100) * 360);
+  document.getElementById('scoreRing').style.setProperty('--deg', deg + 'deg');
+
+  // Save to localStorage
+  const progress = JSON.parse(localStorage.getItem('checkinProgress') || '{}');
+  progress[dayNum] = 'done';
+  localStorage.setItem('checkinProgress', JSON.stringify(progress));
+}
+
+function goHome() { window.location.href = 'index.html'; }
+function retryDay() { window.location.reload(); }
+
+// =============================================
+// Util
+// =============================================
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Start
+window.onload = init;
+</script>
+</body>
+</html>
