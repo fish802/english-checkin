@@ -133,7 +133,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC"
   </div>
 </div>
 
+<div id="wechatTip" style="display:none;background:#fff3cd;border-bottom:2px solid #ffc107;padding:12px 16px;text-align:center;font-size:14px;color:#856404;line-height:1.8;">
+  ⚠️ 检测到您正在微信内打开<br>
+  <b>请点击右上角「···」→「在浏览器中打开」</b><br>
+  以获得完整体验
+</div>
+
 <script>
+// ================ STORAGE FALLBACK ================
+var _memStore={};
+function _lsOk(){try{var k="_t";localStorage.setItem(k,"1");localStorage.removeItem(k);return true;}catch(e){return false;}}
+var _hasLS=_lsOk();
+function _get(k){try{if(_hasLS)return localStorage.getItem(k);}catch(e){}return _memStore[k]||null;}
+function _set(k,v){try{if(_hasLS){localStorage.setItem(k,v);return;}}catch(e){}_memStore[k]=v;}
+
 // ================ LESSON DATA ================
 var LESSONS=[];
 LESSONS[1]={t:"Can I...?",e:"Can I use your...?",d:"请求许可句型 · 文具词汇",v:[{q:"\"教室\"的英文是：",o:["A. classroom","B. bedroom","C. bathroom","D. living room"],a:0},{q:"\"橡皮\"的英文是：",o:["A. ruler","B. pen","C. eraser","D. pencil"],a:2},{q:"\"剪刀\"的英文是：",o:["A. knife","B. scissors","C. sharpener","D. cutter"],a:1},{q:"\"胶水\"的英文是：",o:["A. tape","B. paste","C. stick","D. glue"],a:3},{q:"\"用；使用\"的英文是：",o:["A. make","B. do","C. use","D. take"],a:2}],g:[{q:"Can I ___ your pen?",o:["A. uses","B. use","C. using","D. to use"],a:1},{q:"— Can I use your ruler?\n— Yes, you ___.",o:["A. do","B. are","C. can","D. have"],a:2},{q:"— Can I borrow your glue?\n— ___, here you are.",o:["A. No","B. Sorry","C. Sure","D. Not"],a:2},{q:"\"Can I use it?\"的意思是：",o:["A. 我会做吗？","B. 我能用吗？","C. 它是我的吗？","D. 你看见了吗？"],a:1},{q:"— Can I sit here?\n— No, you ___.",o:["A. can","B. can't","C. do","D. are"],a:1}],s:{w:["I","use","your","eraser","Can","?"],a:"Can I use your eraser ?"}};
@@ -163,14 +176,14 @@ var day=null,vs=0,gs=0,sc=0,vd=0,gd=0,sd=0,st=0,pw=[];
 
 function RP(){
   var done=0;
-  for(var i=1;i<=21;i++){var d=JSON.parse(localStorage.getItem("cd"+i)||"{}");if(d.s)done++;}
+  for(var i=1;i<=21;i++){try{var d=JSON.parse(_get("cd"+i)||"{}");if(d.s)done++;}catch(e){}}
   document.getElementById("doneCount").textContent=done;
   document.getElementById("progressFraction").textContent=done;
   document.getElementById("progressBar").style.width=Math.round(done/21*100)+"%";
   var cc=document.getElementById("cardsContainer");
   cc.innerHTML="";
   for(var i=1;i<=21;i++){
-    var d=JSON.parse(localStorage.getItem("cd"+i)||"{}");
+    try{var d=JSON.parse(_get("cd"+i)||"{}");}catch(e){var d={};}
     var L=LESSONS[i];
     var div=document.createElement("div");
     div.className="day-card"+(d.s?" done":"");
@@ -277,16 +290,31 @@ function TF(){
     document.getElementById("sGrammar").textContent=gs+"/"+L.g.length;
     document.getElementById("sTime").textContent=el;
     p.scrollIntoView({behavior:"smooth"});
-    var k="cd"+day;localStorage.setItem(k,JSON.stringify({s:false,p:pct,t:el,d:new Date().toISOString()}));
+    var k="cd"+day;_set(k,JSON.stringify({s:false,p:pct,t:el,d:new Date().toISOString()}));
   }
 }
 function SC(){
-  var k="cd"+day,ex=JSON.parse(localStorage.getItem(k)||"{}");
-  localStorage.setItem(k,JSON.stringify({s:true,p:ex.p||0,t:ex.t||0,d:ex.d||new Date().toISOString()}));
+  var k="cd"+day;try{var ex=JSON.parse(_get(k)||"{}");}catch(e){var ex={};}
+  _set(k,JSON.stringify({s:true,p:ex.p||0,t:ex.t||0,d:ex.d||new Date().toISOString()}));
   alert("✅ 打卡成功！");CM();
 }
 
-RP();
+// ================ WECHAT DETECT ================
+(function(){
+  try{
+    var ua=navigator.userAgent||"";
+    if(ua.indexOf("MicroMessenger")>-1){
+      document.getElementById("wechatTip").style.display="block";
+      if(!_hasLS){document.getElementById("wechatTip").innerHTML='⚠️ 检测到微信浏览器，存储功能受限<br>打卡进度<b>本次有效，关闭页面后不保存</b><br><b>请点击右上角「···」→「在浏览器中打开」</b>';}
+    }
+  }catch(e){}
+})();
+
+(function(){
+  try{RP();}catch(e){
+    document.getElementById("cardsContainer").innerHTML='<div style="text-align:center;padding:40px 20px;color:#999;">页面加载失败，请尝试：<br><br>1️⃣ 刷新页面<br>2️⃣ 用手机自带浏览器打开<br>3️⃣ 或联系发送者获取文件版</div>';
+  }
+})();
 </script>
 </body>
 </html>
