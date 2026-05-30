@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猿辅导英语 · 21天暑假免费打卡</title>
+<style>
+  :root {
+    --primary: #FF6B35;
+    --primary-light: #FF8C5A;
+    --secondary: #4ECDC4;
+    --bg: #FFF8F4;
+    --card-bg: #FFFFFF;
+    --text: #2D3142;
+    --text-light: #7B7F9E;
+    --done: #52C41A;
+    --done-bg: #F6FFED;
+    --shadow: 0 4px 16px rgba(255,107,53,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #FF6B35 0%, #FF4E4E 100%);
+    padding: 32px 20px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 240px; height: 240px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .logo-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1.5px solid rgba(255,255,255,0.4);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .header h1 {
+    color: #fff;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .header p {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+  }
+  .stat-item {
+    background: rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 10px 20px;
+    color: #fff;
+    text-align: center;
+  }
+  .stat-num { font-size: 22px; font-weight: 800; }
+  .stat-label { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+  /* ── Progress Bar ── */
+  .progress-section {
+    background: #fff;
+    margin: -20px 16px 0;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 10;
+  }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .progress-header span { font-size: 13px; font-weight: 600; color: var(--text); }
+  .progress-header .prog-count { color: var(--primary); }
+  .progress-bar-bg {
+    background: #FFE8DE;
+    border-radius: 8px;
+    height: 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF6B35, #FF4E4E);
+    border-radius: 8px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  /* ── Grid ── */
+  .main { padding: 20px 16px 40px; }
+  .section-title {
+    font-size: 16px; font-weight: 700;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 18px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 12px;
+  }
+
+  /* ── Day Card ── */
+  .day-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 16px 12px 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+    position: relative;
+    border: 2px solid transparent;
+    text-decoration: none;
+    display: block;
+  }
+  .day-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(255,107,53,0.15);
+    border-color: var(--primary-light);
+  }
+  .day-card.done {
+    background: var(--done-bg);
+    border-color: var(--done);
+  }
+  .day-card.locked {
+    opacity: 0.55;
+    cursor: default;
+    pointer-events: none;
+  }
+  .day-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #FF6B35, #FF4E4E);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .day-card.done .day-badge { background: linear-gradient(135deg, #52C41A, #389E0D); }
+  .day-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .day-subtitle {
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.4;
+  }
+  .done-mark {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 22px; height: 22px;
+    background: var(--done);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+  }
+  .day-card.done .done-mark { display: flex; }
+  .enter-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 6px 0;
+    background: linear-gradient(135deg, #FF6B35, #FF4E4E);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .day-card.done .enter-btn { background: linear-gradient(135deg, #52C41A, #389E0D); }
+  .enter-btn:hover { opacity: 0.88; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-badge">🦍 猿辅导英语</div>
+  <h1>21天暑假免费打卡</h1>
+  <p>每天11道题，巩固26年寒春词汇与语法<br>坚持打卡，迎接新学期！</p>
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num">21</div>
+      <div class="stat-label">共计课程</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="doneCount">0</div>
+      <div class="stat-label">已完成</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="totalQ">231</div>
+      <div class="stat-label">练习题目</div>
+    </div>
+  </div>
+</div>
+
+<div class="progress-section">
+  <div class="progress-header">
+    <span>打卡进度</span>
+    <span class="prog-count" id="progText">0 / 21 天</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section-title">选择今天的打卡内容</div>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+
+<div class="footer">猿辅导英语 · 暑假学习加油站 🌟</div>
+
+<script>
+// ── 课程数据 ──
+const LESSONS = [
+  { day: 1,  title: "请求许可 Can I...?",    subtitle: "Can I use your...? · 文具词汇" },
+  { day: 2,  title: "have got 拥有句型",      subtitle: "I've got a... · 生活物品" },
+  { day: 3,  title: "Have you got...?",       subtitle: "一般疑问句·是否拥有 · 玩具" },
+  { day: 4,  title: "I'd like some...",       subtitle: "表达想吃/建议吃 · 食物词汇" },
+  { day: 5,  title: "Would you like...?",     subtitle: "邀请用餐及应答 · 美食词汇" },
+  { day: 6,  title: "感官动词 with结构",      subtitle: "I see/hear with my... · 感官词汇" },
+  { day: 7,  title: "What are these/those?",  subtitle: "询问近处/远处动物 · 动物词汇" },
+  { day: 8,  title: "Whose...is this?",       subtitle: "询问物品归属·描述颜色 · 玩具" },
+  { day: 9,  title: "Where is...? 询问位置",  subtitle: "He's in the + 房间 · 家居房间" },
+  { day: 10, title: "现在进行时（肯定句）",   subtitle: "I'm playing... · 运动词汇" },
+  { day: 11, title: "What day is it?",        subtitle: "询问星期几 · 星期词汇" },
+  { day: 12, title: "课程安排 have...on...",  subtitle: "I have science on Monday · 科目" },
+  { day: 13, title: "Who is that...?",        subtitle: "询问远处人物身份 · 人物词汇" },
+  { day: 14, title: "How many...are there?",  subtitle: "数量询问+there be · 数字11-15" },
+  { day: 15, title: "How much is this?",      subtitle: "询问价格 · 数字16-20" },
+  { day: 16, title: "What time is it?",       subtitle: "询问时间·该做某事 · 日常活动" },
+  { day: 17, title: "What is he/she doing?",  subtitle: "询问他人正在做什么 · 动作词汇" },
+  { day: 18, title: "There be + 方位介词",    subtitle: "in front of/behind/next to · 家居" },
+  { day: 19, title: "Are you...ing? 进行时",  subtitle: "询问是否正在做某事 · 活动词汇" },
+  { day: 20, title: "What are you doing?",    subtitle: "询问对方正在做什么并回答 · 活动" },
+  { day: 21, title: "综合复习",               subtitle: "20课精华汇总 · 冲刺提分" },
+];
+
+function getProgress() {
+  const raw = localStorage.getItem('checkinProgress');
+  return raw ? JSON.parse(raw) : {};
+}
+
+function renderCards() {
+  const progress = getProgress();
+  const done = Object.values(progress).filter(v => v === 'done').length;
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+
+  LESSONS.forEach(lesson => {
+    const isDone = progress[lesson.day] === 'done';
+    const card = document.createElement('a');
+    card.href = `day.html?day=${lesson.day}`;
+    card.className = `day-card${isDone ? ' done' : ''}`;
+
+    card.innerHTML = `
+      <div class="done-mark">✓</div>
+      <div class="day-badge">Day ${lesson.day}</div>
+      <div class="day-title">${lesson.title}</div>
+      <div class="day-subtitle">${lesson.subtitle}</div>
+      <div class="enter-btn">${isDone ? '再练一次' : '开始打卡'}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Update stats
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('progText').textContent = `${done} / 21 天`;
+  document.getElementById('progressBar').style.width = `${(done / 21) * 100}%`;
+}
+
+renderCards();
+</script>
+</body>
+</html>
